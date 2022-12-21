@@ -1,52 +1,51 @@
+package com.urise.webapp.storage;
+
+import com.urise.webapp.model.Resume;
+
 import java.util.Arrays;
 
 public class ArrayStorage {
     Resume[] storage = new Resume[10000];
     private int size;
 
-    void clear() {
+    public void clear() {
         for (int i = 0; i < size; i++) {
             storage[i] = null;
         }
     }
 
-    void save(Resume r) {
+    public void save(Resume r) {
         storage[size] = r;
         size++;
     }
 
-    Resume get(String uuid) {
+    public Resume get(String uuid) {
         for (int i = 0; i < size; i++) {
             Resume r = storage[i];
-            if (r.uuid.equals(uuid)) {
+            if (r.getUuid().equals(uuid)) {
                 return r;
             }
         }
         Resume r = new Resume();
-        r.uuid = "dummy";
+        r.setUuid("dummy");
         return r;
     }
 
-    void delete(String uuid) {
-        int position = -1;
+    public void delete(String uuid) {
         for (int i = 0; i < size; i++) {
-            if (storage[i].uuid.equals(uuid)) {
-                position = i;
-            }
-            if (position != -1) {
-                System.arraycopy(storage, position + 1, storage, position, size - (position + 1));
+            if (storage[i].getUuid().equals(uuid)) {
+                storage[i] = storage[size - 1];
+                storage[size - 1] = null;
                 size--;
-            } else {
-                System.out.println("Нет резюме с таким uuid");
             }
         }
     }
 
-    Resume[] getAll() {
+    public Resume[] getAll() {
         return Arrays.copyOf(storage, size);
     }
 
-    int size() {
+    public int size() {
         return size;
     }
 }
