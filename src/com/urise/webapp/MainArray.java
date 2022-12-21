@@ -42,7 +42,11 @@ public class MainArray {
                     printAll();
                     break;
                 case "delete":
-                    ARRAY_STORAGE.delete(uuid);
+                    try {
+                        ARRAY_STORAGE.delete(uuid);
+                    } catch (RuntimeException e) {
+                        System.out.println(e.getMessage());
+                    }
                     printAll();
                     break;
                 case "get":

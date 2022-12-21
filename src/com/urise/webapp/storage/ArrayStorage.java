@@ -5,7 +5,8 @@ import com.urise.webapp.model.Resume;
 import java.util.Arrays;
 
 public class ArrayStorage {
-    Resume[] storage = new Resume[10000];
+    private static final int MAX_SIZE = 10000;
+    Resume[] storage = new Resume[MAX_SIZE];
     private int size;
 
     public void clear() {
@@ -39,6 +40,7 @@ public class ArrayStorage {
                 size--;
             }
         }
+        throw (new RuntimeException("Нет элемента с uuid " + uuid));
     }
 
     public Resume[] getAll() {
