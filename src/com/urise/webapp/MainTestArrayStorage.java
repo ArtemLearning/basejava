@@ -17,23 +17,50 @@ public class MainTestArrayStorage {
         Resume r3 = new Resume();
         r3.setUuid("uuid3");
 
-        ARRAY_STORAGE.save(r1);
-        ARRAY_STORAGE.save(r2);
-        ARRAY_STORAGE.save(r3);
+        //method save with check
+        try {
+            ARRAY_STORAGE.save(r1);
+            ARRAY_STORAGE.save(r2);
+            ARRAY_STORAGE.save(r3);
+        } catch (RuntimeException e) {
+            System.out.println(e.getMessage());
+        }
 
+        //method get
         System.out.println("Get r1: " + ARRAY_STORAGE.get(r1.getUuid()));
+
+        //method size
         System.out.println("Size: " + ARRAY_STORAGE.size());
 
-        System.out.println("Get dummy: " + ARRAY_STORAGE.get("dummy"));
+        // New update method with check
+        r1.setUuid("NewUUID");
+        try {
+            ARRAY_STORAGE.update(r1);
+        } catch (RuntimeException e) {
+            System.out.println(e.getMessage());
+        }
+
+        //get dummy should return error
+        try {
+            System.out.println("Get dummy: " + ARRAY_STORAGE.get("dummy"));
+        } catch (RuntimeException e) {
+            System.out.println(e.getMessage());
+        }
 
         printAll();
+
+        //method delete with check
         try {
             ARRAY_STORAGE.delete(r1.getUuid());
         } catch (RuntimeException e) {
             System.out.println(e.getMessage());
         }
+
         printAll();
+
+        //clear db
         ARRAY_STORAGE.clear();
+
         printAll();
 
         System.out.println("Size: " + ARRAY_STORAGE.size());
