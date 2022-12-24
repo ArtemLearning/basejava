@@ -6,63 +6,52 @@ import java.util.Arrays;
 
 public class ArrayStorage {
     private static final int MAX_SIZE = 10000;
-    Resume[] storage = new Resume[MAX_SIZE];
+    private final Resume[] storage = new Resume[MAX_SIZE];
     private int size;
 
     public void clear() {
-        for (int i = size - 1; i >= 0; i--) {
-            storage[i] = new Resume();
-            size--;
+        if (size > 0) {
+            Arrays.fill(storage, 0, size - 1, null);
+            size = 0;
         }
     }
 
     public void save(Resume r) {
         if (size == MAX_SIZE) {
             throw (new RuntimeException("База резюме полностью заполнена"));
+        } else if (getSearchKey(r.getUuid()) != -1) {
+            throw (new RuntimeException("Резюме c uuid " + r.getUuid() + " уже есть в базе"));
+        } else {
+            storage[size] = r;
+            size++;
         }
-        for (int i = 0; i < size; i++) {
-            if (storage[i].getUuid().equals(r.getUuid())) {
-                throw (new RuntimeException("Резюме c uuid " + r.getUuid() + " уже есть в базе"));
-            }
-        }
-        storage[size] = r;
-        size++;
     }
 
     public void update(Resume r) {
-        boolean check = false;
-        for (int i = 0; i < size; i++) {
-            if (storage[i] == r) {
-                storage[i].setUuid(r.getUuid());
-                check = true;
-            }
-        }
-        if (!check) {
-            throw (new RuntimeException("Нет резюме " + r));
+        int index = getSearchKey(r.getUuid());
+        if (index != -1) {
+            storage[index] = r;
+        } else {
+            throw (new RuntimeException("В БД нет резюме c uuid" + r.getUuid()));
         }
     }
 
     public Resume get(String uuid) {
-        for (int i = 0; i < size; i++) {
-            Resume r = storage[i];
-            if (r.getUuid().equals(uuid)) {
-                return r;
-            }
+        int index = getSearchKey(uuid);
+        if (index != -1) {
+            return storage[index];
+        } else {
+            throw (new RuntimeException("В БД нет резюме c uuid" + uuid));
         }
-        throw (new RuntimeException("Нет резюме с uuid " + uuid));
     }
 
     public void delete(String uuid) {
-        boolean check = false;
-        for (int i = 0; i < size; i++) {
-            if (storage[i].getUuid().equals(uuid)) {
-                storage[i] = storage[size - 1];
-                storage[size - 1] = null;
-                size--;
-                check = true;
-            }
-        }
-        if (!check) {
+        int index = getSearchKey(uuid);
+        if (index != -1) {
+            storage[index] = storage[size - 1];
+            storage[size - 1] = null;
+            size--;
+        } else {
             throw (new RuntimeException("Нет резюме с uuid " + uuid));
         }
     }
@@ -73,5 +62,14 @@ public class ArrayStorage {
 
     public int size() {
         return size;
+    }
+
+    public int getSearchKey(String uuid) {
+        for (int i = 0; i < size; i++) {
+            if (storage[i].getUuid().equals(uuid)) {
+                return i;
+            }
+        }
+        return -1;
     }
 }
