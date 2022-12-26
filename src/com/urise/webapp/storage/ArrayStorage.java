@@ -4,26 +4,12 @@ import com.urise.webapp.model.Resume;
 
 import java.util.Arrays;
 
-public class ArrayStorage {
-    private static final int MAX_SIZE = 10000;
-    private final Resume[] storage = new Resume[MAX_SIZE];
-    private int size;
+public class ArrayStorage extends AbstractArrayStorage {
 
     public void clear() {
         if (size > 0) {
-            Arrays.fill(storage, 0, size - 1, null);
+            Arrays.fill(storage, 0, size, null);
             size = 0;
-        }
-    }
-
-    public void save(Resume r) {
-        if (size == MAX_SIZE) {
-            throw (new RuntimeException("База резюме полностью заполнена"));
-        } else if (getSearchKey(r.getUuid()) != -1) {
-            throw (new RuntimeException("Резюме c uuid " + r.getUuid() + " уже есть в базе"));
-        } else {
-            storage[size] = r;
-            size++;
         }
     }
 
@@ -36,12 +22,14 @@ public class ArrayStorage {
         }
     }
 
-    public Resume get(String uuid) {
-        int index = getSearchKey(uuid);
-        if (index != -1) {
-            return storage[index];
+    public void save(Resume r) {
+        if (size == MAX_SIZE) {
+            throw (new RuntimeException("База резюме полностью заполнена"));
+        } else if (getSearchKey(r.getUuid()) != -1) {
+            throw (new RuntimeException("Резюме c uuid " + r.getUuid() + " уже есть в базе"));
         } else {
-            throw (new RuntimeException("В БД нет резюме c uuid" + uuid));
+            storage[size] = r;
+            size++;
         }
     }
 
@@ -60,11 +48,7 @@ public class ArrayStorage {
         return Arrays.copyOf(storage, size);
     }
 
-    public int size() {
-        return size;
-    }
-
-    public int getSearchKey(String uuid) {
+    protected int getSearchKey(String uuid) {
         for (int i = 0; i < size; i++) {
             if (storage[i].getUuid().equals(uuid)) {
                 return i;
