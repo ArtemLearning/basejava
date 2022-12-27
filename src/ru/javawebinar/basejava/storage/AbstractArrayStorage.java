@@ -1,12 +1,12 @@
-package com.urise.webapp.storage;
+package ru.javawebinar.basejava.storage;
 
-import com.urise.webapp.model.Resume;
+import ru.javawebinar.basejava.model.Resume;
 
 import java.util.Arrays;
 
 public abstract class AbstractArrayStorage implements Storage {
-    protected static final int MAX_SIZE = 10000;
-    protected final Resume[] storage = new Resume[MAX_SIZE];
+    protected static final int STORAGE_LIMIT = 10000;
+    protected final Resume[] storage = new Resume[STORAGE_LIMIT];
     protected int size;
 
     public int size() {
@@ -14,7 +14,7 @@ public abstract class AbstractArrayStorage implements Storage {
     }
 
     public Resume get(String uuid) {
-        int index = getSearchKey(uuid);
+        int index = getIndex(uuid);
         if (index != -1) {
             return storage[index];
         } else {
@@ -23,7 +23,7 @@ public abstract class AbstractArrayStorage implements Storage {
     }
 
     public void update(Resume r) {
-        int index = getSearchKey(r.getUuid());
+        int index = getIndex(r.getUuid());
         if (index < 0) {
             throw (new RuntimeException("В БД нет резюме c uuid " + r.getUuid()));
         } else {
@@ -39,9 +39,9 @@ public abstract class AbstractArrayStorage implements Storage {
     }
 
     public void save(Resume r) {
-        if (size == MAX_SIZE) {
+        if (size == STORAGE_LIMIT) {
             throw (new RuntimeException("База резюме полностью заполнена"));
-        } else if (getSearchKey(r.getUuid()) > 0) {
+        } else if (getIndex(r.getUuid()) > 0) {
             throw (new RuntimeException("Резюме c uuid " + r.getUuid() + " уже есть в базе"));
         } else {
             storage[size] = r;
@@ -50,7 +50,7 @@ public abstract class AbstractArrayStorage implements Storage {
     }
 
     public void delete(String uuid) {
-        int index = getSearchKey(uuid);
+        int index = getIndex(uuid);
         if (index != -1) {
             storage[index] = storage[size - 1];
             storage[size - 1] = null;
@@ -64,5 +64,5 @@ public abstract class AbstractArrayStorage implements Storage {
         return Arrays.copyOf(storage, size);
     }
 
-    protected abstract int getSearchKey(String uuid);
+    protected abstract int getIndex(String uuid);
 }
