@@ -8,14 +8,19 @@ public class SortedArrayStorage extends AbstractArrayStorage {
 
     @Override
     public void save(Resume r) {
-        super.save(r);
         Arrays.sort(storage, 0, size);
     }
 
     @Override
     public void delete(String uuid) {
-        super.delete(uuid);
-        Arrays.sort(storage, 0, size);
+        int index = getIndex(uuid);
+        if (index != -1) {
+            storage[index] = storage[size - 1];
+            storage[size - 1] = null;
+            size--;
+        } else {
+            throw (new RuntimeException("Нет резюме с uuid " + uuid));
+        }
     }
 
     @Override
@@ -23,5 +28,15 @@ public class SortedArrayStorage extends AbstractArrayStorage {
         Resume index = new Resume();
         index.setUuid(uuid);
         return Arrays.binarySearch(storage, 0, size, index);
+    }
+
+    @Override
+    public void update(Resume r) {
+        int index = getIndex(r.getUuid());
+        if (index < 0) {
+            throw (new RuntimeException("В БД нет резюме c uuid " + r.getUuid()));
+        } else {
+            storage[index] = r;
+        }
     }
 }
