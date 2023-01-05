@@ -15,14 +15,9 @@ public class ArrayStorage extends AbstractArrayStorage {
 
     @Override
     public void save(Resume r) {
-        if (size == STORAGE_LIMIT) {
-            throw (new RuntimeException("База резюме полностью заполнена"));
-        } else if (getIndex(r.getUuid()) > 0) {
-            throw (new RuntimeException("Резюме c uuid " + r.getUuid() + " уже есть в базе"));
-        } else {
-            storage[size] = r;
-            size++;
-        }
+        super.save(r);
+        storage[size] = r;
+        size++;
     }
 
     @Override
@@ -34,16 +29,6 @@ public class ArrayStorage extends AbstractArrayStorage {
             size--;
         } else {
             throw (new RuntimeException("Нет резюме с uuid " + uuid));
-        }
-    }
-
-    @Override
-    public final void update(Resume r) {
-        int index = getIndex(r.getUuid());
-        if (index < 0) {
-            throw (new RuntimeException("В БД нет резюме c uuid " + r.getUuid()));
-        } else {
-            storage[index] = r;
         }
     }
 }

@@ -33,9 +33,22 @@ public abstract class AbstractArrayStorage implements Storage {
         return Arrays.copyOf(storage, size);
     }
 
-    public abstract void update(Resume r);
+    public final void update(Resume r) {
+        int index = getIndex(r.getUuid());
+        if (index < 0) {
+            throw (new RuntimeException("В БД нет резюме c uuid " + r.getUuid()));
+        } else {
+            storage[index] = r;
+        }
+    }
 
-    public abstract void save(Resume r);
+    public void save(Resume r) {
+        if (size == STORAGE_LIMIT) {
+            throw (new RuntimeException("База резюме полностью заполнена"));
+        } else if (getIndex(r.getUuid()) > 0) {
+            throw (new RuntimeException("Резюме c uuid " + r.getUuid() + " уже есть в базе"));
+        }
+    }
 
     public abstract void delete(String uuid);
 
