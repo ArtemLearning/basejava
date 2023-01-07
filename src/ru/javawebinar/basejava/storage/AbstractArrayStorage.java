@@ -38,11 +38,12 @@ public abstract class AbstractArrayStorage implements Storage {
         if (index < 0) {
             throw (new RuntimeException("В БД нет резюме c uuid " + r.getUuid()));
         } else {
-            storage[index] = r;
+            deleteElement(index);
+            saveElement(r);
         }
     }
 
-    public void save(Resume r) {
+    public final void save(Resume r) {
         if (size == STORAGE_LIMIT) {
             throw (new RuntimeException("База резюме полностью заполнена"));
         } else if (getIndex(r.getUuid()) > 0) {
@@ -51,7 +52,7 @@ public abstract class AbstractArrayStorage implements Storage {
         saveElement(r);
     }
 
-    public void delete(String uuid) {
+    public final void delete(String uuid) {
         int index = getIndex(uuid);
         if (index != -1) {
             deleteElement(index);

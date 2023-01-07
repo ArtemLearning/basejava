@@ -50,7 +50,7 @@ public class MainTestArrayStorage {
 
         //delete
         try {
-            ARRAY_STORAGE.delete(r3.getUuid());
+            ARRAY_STORAGE.delete(r1.getUuid());
         } catch (RuntimeException e) {
             System.out.println(e.getMessage());
         }
