@@ -7,8 +7,7 @@ import java.util.Arrays;
 public class SortedArrayStorage extends AbstractArrayStorage {
 
     @Override
-    public void save(Resume r) {
-        super.save(r);
+    protected void saveElement(Resume r) {
         for (int i = 0; i < size; i++) {
             if (storage[i].getUuid().compareTo(r.getUuid()) > 0) {
                 for (int j = size; j > i; j--) {
@@ -24,17 +23,12 @@ public class SortedArrayStorage extends AbstractArrayStorage {
     }
 
     @Override
-    public void delete(String uuid) {
-        int index = getIndex(uuid);
-        if (index != -1) {
-            for (int j = index; j < size - 1; j++) {
-                storage[j] = storage[j + 1];
-            }
-            storage[size - 1] = null;
-            size--;
-        } else {
-            throw (new RuntimeException("Нет резюме с uuid " + uuid));
+    protected void deleteElement(int index) {
+        for (int j = index; j < size - 1; j++) {
+            storage[j] = storage[j + 1];
         }
+        storage[size - 1] = null;
+        size--;
     }
 
     @Override

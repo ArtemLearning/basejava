@@ -14,21 +14,15 @@ public class ArrayStorage extends AbstractArrayStorage {
     }
 
     @Override
-    public void save(Resume r) {
-        super.save(r);
+    protected void saveElement(Resume r) {
         storage[size] = r;
         size++;
     }
 
     @Override
-    public void delete(String uuid) {
-        int index = getIndex(uuid);
-        if (index != -1) {
-            storage[index] = storage[size - 1];
-            storage[size - 1] = null;
-            size--;
-        } else {
-            throw (new RuntimeException("Нет резюме с uuid " + uuid));
-        }
+    protected void deleteElement(int index) {
+        storage[index] = storage[size - 1];
+        storage[size - 1] = null;
+        size--;
     }
 }

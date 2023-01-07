@@ -48,9 +48,21 @@ public abstract class AbstractArrayStorage implements Storage {
         } else if (getIndex(r.getUuid()) > 0) {
             throw (new RuntimeException("Резюме c uuid " + r.getUuid() + " уже есть в базе"));
         }
+        saveElement(r);
     }
 
-    public abstract void delete(String uuid);
+    public void delete(String uuid) {
+        int index = getIndex(uuid);
+        if (index != -1) {
+            deleteElement(index);
+        }  else {
+            throw (new RuntimeException("Нет резюме с uuid " + uuid));
+        }
+    }
+
+    protected abstract void saveElement(Resume r);
+
+    protected abstract void deleteElement(int index);
 
     protected abstract int getIndex(String uuid);
 }
