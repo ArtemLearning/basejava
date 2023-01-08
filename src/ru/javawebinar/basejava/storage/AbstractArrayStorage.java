@@ -1,5 +1,8 @@
 package ru.javawebinar.basejava.storage;
 
+import ru.javawebinar.basejava.exception.ExistStorageException;
+import ru.javawebinar.basejava.exception.NotExistStorageException;
+import ru.javawebinar.basejava.exception.StorageException;
 import ru.javawebinar.basejava.model.Resume;
 
 import java.util.Arrays;
@@ -16,7 +19,7 @@ public abstract class AbstractArrayStorage implements Storage {
     public final Resume get(String uuid) {
         int index = getIndex(uuid);
         if (index < 0) {
-            throw new RuntimeException("В БД нет резюме c uuid " + uuid);
+            throw new NotExistStorageException(uuid);
         } else {
             return storage[index];
         }
@@ -36,7 +39,7 @@ public abstract class AbstractArrayStorage implements Storage {
     public final void update(Resume r) {
         int index = getIndex(r.getUuid());
         if (index < 0) {
-            throw new RuntimeException("В БД нет резюме c uuid " + r.getUuid());
+            throw new NotExistStorageException(r.getUuid());
         } else {
             storage[index] = r;
         }
@@ -45,9 +48,9 @@ public abstract class AbstractArrayStorage implements Storage {
     public final void save(Resume r) {
         int index = getIndex(r.getUuid());
         if (size == STORAGE_LIMIT) {
-            throw new RuntimeException("База резюме полностью заполнена");
+            throw new StorageException("База резюме полностью заполнена", r.getUuid());
         } else if (index > 0) {
-            throw new RuntimeException("Резюме c uuid " + r.getUuid() + " уже есть в базе");
+            throw new ExistStorageException(r.getUuid());
         }
         insertElement(r, index);
         size++;
@@ -56,7 +59,7 @@ public abstract class AbstractArrayStorage implements Storage {
     public final void delete(String uuid) {
         int index = getIndex(uuid);
         if (index < 0) {
-            throw new RuntimeException("Нет резюме с uuid " + uuid);
+            throw new NotExistStorageException(uuid);
         } else {
             fillDeletedElement(index);
             storage[size - 1] = null;

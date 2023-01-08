@@ -33,8 +33,7 @@ public class MainArray {
                 case "list" -> printAll();
                 case "size" -> System.out.println(ARRAY_STORAGE.size());
                 case "save" -> {
-                    r = new Resume();
-                    r.setUuid(uuid);
+                    r = new Resume(uuid);
                     ARRAY_STORAGE.save(r);
                     printAll();
                 }
