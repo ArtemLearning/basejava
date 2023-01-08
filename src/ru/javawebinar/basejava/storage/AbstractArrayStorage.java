@@ -18,7 +18,7 @@ public abstract class AbstractArrayStorage implements Storage {
         if (index != -1) {
             return storage[index];
         } else {
-            throw (new RuntimeException("В БД нет резюме c uuid " + uuid));
+            throw new RuntimeException("В БД нет резюме c uuid " + uuid);
         }
     }
 
@@ -36,28 +36,31 @@ public abstract class AbstractArrayStorage implements Storage {
     public final void update(Resume r) {
         int index = getIndex(r.getUuid());
         if (index < 0) {
-            throw (new RuntimeException("В БД нет резюме c uuid " + r.getUuid()));
+            throw new RuntimeException("В БД нет резюме c uuid " + r.getUuid());
         } else {
-            deleteElement(index);
-            saveElement(r);
+            delete(r.getUuid());
+            save(r);
         }
     }
 
     public final void save(Resume r) {
         if (size == STORAGE_LIMIT) {
-            throw (new RuntimeException("База резюме полностью заполнена"));
+            throw new RuntimeException("База резюме полностью заполнена");
         } else if (getIndex(r.getUuid()) > 0) {
-            throw (new RuntimeException("Резюме c uuid " + r.getUuid() + " уже есть в базе"));
+            throw new RuntimeException("Резюме c uuid " + r.getUuid() + " уже есть в базе");
         }
         saveElement(r);
+        size++;
     }
 
     public final void delete(String uuid) {
         int index = getIndex(uuid);
         if (index != -1) {
             deleteElement(index);
+            storage[size - 1] = null;
+            size--;
         }  else {
-            throw (new RuntimeException("Нет резюме с uuid " + uuid));
+            throw new RuntimeException("Нет резюме с uuid " + uuid);
         }
     }
 
