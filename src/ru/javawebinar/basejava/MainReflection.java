@@ -12,7 +12,8 @@ public class MainReflection {
         System.out.println(field.getName());
         field.get(r);
         field.set(r, "new");
-        // TODO : invoke r.toString via reflection
+        System.out.println("toString direct from Resume " + r.toString());
+        System.out.println("toString via reflection " + field.get(r).toString());
         System.out.println(r);
     }
 }
