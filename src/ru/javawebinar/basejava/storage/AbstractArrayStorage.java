@@ -49,11 +49,13 @@ public abstract class AbstractArrayStorage implements Storage {
         int index = getIndex(r.getUuid());
         if (size == STORAGE_LIMIT) {
             throw new StorageException("База резюме полностью заполнена", r.getUuid());
-        } else if (index > 0) {
+        } else if (index < 0) {
+            insertElement(r, index);
+            size++;
+        } else {
             throw new ExistStorageException(r.getUuid());
         }
-        insertElement(r, index);
-        size++;
+
     }
 
     public final void delete(String uuid) {
