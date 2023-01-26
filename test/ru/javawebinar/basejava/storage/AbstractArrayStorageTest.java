@@ -1,6 +1,5 @@
 package ru.javawebinar.basejava.storage;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import ru.javawebinar.basejava.exception.ExistStorageException;
@@ -8,17 +7,27 @@ import ru.javawebinar.basejava.exception.NotExistStorageException;
 import ru.javawebinar.basejava.exception.StorageException;
 import ru.javawebinar.basejava.model.Resume;
 
+import static org.junit.Assert.*;
+
 public abstract class AbstractArrayStorageTest {
     private static final String UUID_1 = "uuid1";
     private static final String UUID_2 = "uuid2";
     private static final String UUID_3 = "uuid3";
     private static final String UUID_NOT_EXIST = "dummy";
-    private static final String ERROR_MESSAGE = "Ошибка сравнения";
-    private static final Resume RESUME_1 = new Resume(UUID_1);
-    private static final Resume RESUME_2 = new Resume(UUID_2);
-    private static final Resume RESUME_3 = new Resume(UUID_3);
-    private static final Resume[] expectedStorage = new Resume[]{RESUME_1, RESUME_2, RESUME_3};
-    private static final Resume REF_RESUME = new Resume("refUuid");
+    private static final Resume RESUME_1;
+    private static final Resume RESUME_2;
+    private static final Resume RESUME_3;
+    private static final Resume[] expectedStorage;
+    private static final Resume REF_RESUME;
+
+    static {
+            RESUME_1 = new Resume(UUID_1);
+            RESUME_2 = new Resume(UUID_2);
+            RESUME_3 = new Resume(UUID_3);
+            expectedStorage = new Resume[]{RESUME_1, RESUME_2, RESUME_3};
+            REF_RESUME = new Resume("refUuid");
+    }
+
     private final Storage storage;
 
     public AbstractArrayStorageTest(Storage storage) {
@@ -40,40 +49,39 @@ public abstract class AbstractArrayStorageTest {
 
     @Test
     public void get() throws NotExistStorageException {
-        assertGet(storage.get(UUID_1));
-        assertGet(storage.get(UUID_2));
-        assertGet(storage.get(UUID_3));
+        assertGet(RESUME_1);
+        assertGet(RESUME_2);
+        assertGet(RESUME_3);
     }
 
     @Test
     public void clear() {
+        assertArrayEquals(expectedStorage, storage.getAll());
         storage.clear();
         assertSize(0);
-        Assert.assertArrayEquals(ERROR_MESSAGE, expectedStorage, storage.getAll());
     }
 
     @Test
     public void getAll() {
-        assertSize(expectedStorage.length);
-        Assert.assertArrayEquals(ERROR_MESSAGE, expectedStorage, storage.getAll());
+        Resume[] array = storage.getAll();
+        assertEquals(3, array.length);
+        assertEquals(RESUME_1, array[0]);
+        assertEquals(RESUME_2, array[1]);
+        assertEquals(RESUME_3, array[2]);
     }
 
     @Test
     public void update() throws NotExistStorageException {
-        storage.update(RESUME_1);
-        Assert.assertSame(RESUME_1, storage.get(RESUME_1.getUuid()));
-        storage.update(RESUME_2);
-        Assert.assertSame(RESUME_2, storage.get(RESUME_2.getUuid()));
-        storage.update(RESUME_3);
-        Assert.assertSame(RESUME_3, storage.get(RESUME_3.getUuid()));
-
+        Resume newResume = new Resume(UUID_1);
+        storage.update(newResume);
+        assertSame(newResume, storage.get(UUID_1));
     }
 
     @Test
     public void save() throws StorageException {
         storage.save(REF_RESUME);
-        assertGet(REF_RESUME);
         assertSize(4);
+        assertGet(REF_RESUME);
     }
 
     @Test(expected = NotExistStorageException.class)
@@ -107,7 +115,7 @@ public abstract class AbstractArrayStorageTest {
                 storage.save(new Resume(uuid));
             }
         } catch (RuntimeException e) {
-            Assert.fail("Раннее переполнение");
+            fail("Раннее переполнение");
         }
         storage.save(new Resume(UUID_NOT_EXIST));
     }
@@ -118,10 +126,10 @@ public abstract class AbstractArrayStorageTest {
     }
 
     private void assertSize(int expected) {
-        Assert.assertEquals(ERROR_MESSAGE, expected, storage.size());
+        assertEquals(expected, storage.size());
     }
 
     private void assertGet(Resume r) {
-        Assert.assertEquals(ERROR_MESSAGE, r, storage.get(r.getUuid()));
+        assertEquals(r, storage.get(r.getUuid()));
     }
 }
