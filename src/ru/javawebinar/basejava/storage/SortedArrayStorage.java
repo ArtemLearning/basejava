@@ -12,6 +12,7 @@ public class SortedArrayStorage extends AbstractArrayStorage {
         if (numMoved > 0) {
             System.arraycopy(storage, index + 1, storage, index, numMoved);
         }
+        storage[size - 1] = null;
     }
 
     @Override
@@ -26,5 +27,10 @@ public class SortedArrayStorage extends AbstractArrayStorage {
     protected int getIndex(String uuid) {
         Resume index = new Resume(uuid);
         return Arrays.binarySearch(storage, 0, size, index);
+    }
+
+    @Override
+    protected Resume getElement(int index) {
+        return storage[index];
     }
 }
