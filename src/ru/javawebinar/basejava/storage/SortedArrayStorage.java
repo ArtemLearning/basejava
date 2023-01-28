@@ -1,36 +1,47 @@
 package ru.javawebinar.basejava.storage;
 
+import ru.javawebinar.basejava.exception.StorageException;
 import ru.javawebinar.basejava.model.Resume;
 
 import java.util.Arrays;
 
 public class SortedArrayStorage extends AbstractArrayStorage {
+    @Override
+    protected Object getSearchKey(String uuid) {
+        if (size == 0) {
+            return -1;
+        }
+        Resume check = new Resume(uuid);
+        return Arrays.binarySearch(storage, 0, size, check);
+    }
 
     @Override
-    protected void fillDeletedElement(int index) {
+    protected void doSave(Resume r) {
+        if (size == STORAGE_LIMIT) {
+            throw new StorageException("База резюме полностью заполнена", r.getUuid());
+        }
+//      http://codereview.stackexchange.com/questions/36221/binary-search-for-inserting-in-array#answer-36239
+        int index = Arrays.binarySearch(storage, 0, size, r);
+        int insertIdx = -index - 1;
+        System.arraycopy(storage, insertIdx, storage, insertIdx + 1, size - insertIdx);
+        storage[insertIdx] = r;
+        size++;
+    }
+
+    @Override
+    protected void doUpdate(Object searchKey, Resume r) {
+        int index = (Integer) searchKey;
+        storage[index] = r;
+    }
+
+    @Override
+    protected void doDelete(Object searchKey) {
+        int index = (Integer) searchKey;
         int numMoved = size - 1 - index;
         if (numMoved > 0) {
             System.arraycopy(storage, index + 1, storage, index, numMoved);
         }
         storage[size - 1] = null;
-    }
-
-    @Override
-    protected void insertElement(Resume r, int index) {
-//      http://codereview.stackexchange.com/questions/36221/binary-search-for-inserting-in-array#answer-36239
-        int insertIdx = -index - 1;
-        System.arraycopy(storage, insertIdx, storage, insertIdx + 1, size - insertIdx);
-        storage[insertIdx] = r;
-    }
-
-    @Override
-    protected int getIndex(String uuid) {
-        Resume index = new Resume(uuid);
-        return Arrays.binarySearch(storage, 0, size, index);
-    }
-
-    @Override
-    protected Resume getElement(int index) {
-        return storage[index];
+        size--;
     }
 }

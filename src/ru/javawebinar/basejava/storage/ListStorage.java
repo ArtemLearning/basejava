@@ -8,38 +8,9 @@ public class ListStorage extends AbstractArrayStorage {
     protected ArrayList<Resume> storage;
 
     @Override
-    protected void insertElement(Resume r, int index) {
-        storage.add(r);
-    }
-
-    @Override
-    protected void fillDeletedElement(int index) {
-        storage.remove(index);
-    }
-
-    @Override
-    protected int getIndex(String uuid) {
-        if (storage.isEmpty()) {
-            return -1;
-        }
-        Resume r = new Resume(uuid);
-        return storage.indexOf(r);
-    }
-
-    @Override
-    protected Resume getElement(int index) {
-        return storage.get(index);
-    }
-
-    @Override
     protected Resume[] getStorage() {
         storage = new ArrayList<>();
         return storage.toArray(new Resume[0]);
-    }
-
-    @Override
-    protected void updateStorage(Resume r, int index) {
-        storage.set(index, r);
     }
 
     @Override
@@ -50,5 +21,42 @@ public class ListStorage extends AbstractArrayStorage {
     @Override
     protected void clearStorage() {
         storage.clear();
+    }
+
+    @Override
+    protected Object getSearchKey(String uuid) {
+        for (int i = 0; i < storage.size(); i++) {
+            if (uuid.equals(storage.get(i).getUuid())) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    @Override
+    protected boolean isExist(String uuid) {
+        return (Integer) getSearchKey(uuid) >= 0;
+    }
+
+    @Override
+    protected Resume doGet(Object searchKey) {
+        return storage.get((Integer) searchKey);
+    }
+
+    @Override
+    protected void doSave(Resume r) {
+        storage.add(r);
+    }
+
+    @Override
+    protected void doUpdate(Object searchKey, Resume r) {
+        int index = (Integer) searchKey;
+        storage.set(index, r);
+    }
+
+    @Override
+    protected void doDelete(Object searchKey) {
+        int index = (Integer) searchKey;
+        storage.remove(index);
     }
 }

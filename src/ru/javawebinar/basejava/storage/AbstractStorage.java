@@ -2,81 +2,70 @@ package ru.javawebinar.basejava.storage;
 
 import ru.javawebinar.basejava.exception.ExistStorageException;
 import ru.javawebinar.basejava.exception.NotExistStorageException;
-import ru.javawebinar.basejava.exception.StorageException;
 import ru.javawebinar.basejava.model.Resume;
 
 public abstract class AbstractStorage implements Storage {
-
-    protected static final int STORAGE_LIMIT = 10000;
-    protected int size;
     protected Resume[] storage = getStorage();
+    protected Object searchKey;
+    protected int size;
 
     public final int size() {
         return size;
     }
 
     public final Resume get(String uuid) {
-        int index = getIndex(uuid);
-        if (index < 0) {
-            throw new NotExistStorageException(uuid);
-        } else {
-            return getElement(index);
-        }
-    }
-
-    public final void clear() {
-        if (size > 0) {
-            clearStorage();
-            size = 0;
-        }
-    }
-
-    public final void update(Resume r) {
-        int index = getIndex(r.getUuid());
-        if (index < 0) {
-            throw new NotExistStorageException(r.getUuid());
-        } else {
-            updateStorage(r, index);
-        }
+        searchKey = getExistingSearchKey(uuid);
+        return doGet(searchKey);
     }
 
     public final void save(Resume r) {
-        int index = getIndex(r.getUuid());
-        if (size == STORAGE_LIMIT) {
-            throw new StorageException("База резюме полностью заполнена", r.getUuid());
-        } else if (index < 0) {
-            insertElement(r, index);
-            size++;
-        } else {
-            throw new ExistStorageException(r.getUuid());
-        }
+        searchKey = getNotExistingSearchKey(r.getUuid());
+        doSave(r);
+    }
 
+    public final void update(Resume r) {
+        searchKey = getExistingSearchKey(r.getUuid());
+        doUpdate(searchKey, r);
     }
 
     public final void delete(String uuid) {
-        int index = getIndex(uuid);
-        if (index < 0) {
-            throw new NotExistStorageException(uuid);
-        } else {
-            fillDeletedElement(index);
-            size--;
-
-        }
+        Object searchKey = getExistingSearchKey(uuid);
+        doDelete(searchKey);
     }
 
-    protected abstract void insertElement(Resume r, int index);
+    protected Object getExistingSearchKey(String uuid) {
+        if (isExist(uuid)) {
+            return getSearchKey(uuid);
+        }
+        throw new NotExistStorageException(uuid);
+    }
 
-    protected abstract void fillDeletedElement(int index);
+    protected Object getNotExistingSearchKey(String uuid) {
+        if (isExist(uuid)) {
+            throw new ExistStorageException(uuid);
+        }
+        return null;
+    }
 
-    protected abstract int getIndex(String uuid);
-
-    protected abstract Resume getElement(int index);
+    public final void clear() {
+        clearStorage();
+    }
 
     protected abstract Resume[] getStorage();
-
-    protected abstract void updateStorage(Resume r, int index);
 
     public abstract Resume[] getAll();
 
     protected abstract void clearStorage();
+
+    protected abstract Object getSearchKey(String uuid);
+
+    protected abstract boolean isExist(String uuid);
+
+    protected abstract Resume doGet(Object searchKey);
+
+    protected abstract void doSave(Resume r);
+
+    protected abstract void doUpdate(Object searchKey, Resume r);
+
+    protected abstract void doDelete(Object searchKey);
 }
