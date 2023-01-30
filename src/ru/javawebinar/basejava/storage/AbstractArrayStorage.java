@@ -29,9 +29,8 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     }
 
     @Override
-    protected boolean isExist(String uuid) {
-        Object searchKey = getSearchKey(uuid);
-        return Integer.parseInt(String.valueOf(searchKey)) >= 0;
+    protected boolean isExist(Object searchKey) {
+        return (Integer) searchKey >= 0;
     }
 
     protected Resume doGet(Object searchKey) {
