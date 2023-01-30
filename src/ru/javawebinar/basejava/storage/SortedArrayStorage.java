@@ -1,6 +1,5 @@
 package ru.javawebinar.basejava.storage;
 
-import ru.javawebinar.basejava.exception.StorageException;
 import ru.javawebinar.basejava.model.Resume;
 
 import java.util.Arrays;
@@ -14,34 +13,21 @@ public class SortedArrayStorage extends AbstractArrayStorage {
         Resume check = new Resume(uuid);
         return Arrays.binarySearch(storage, 0, size, check);
     }
-
-    @Override
-    protected void doSave(Resume r) {
-        if (size == STORAGE_LIMIT) {
-            throw new StorageException("База резюме полностью заполнена", r.getUuid());
-        }
+    @Override protected void saveArrayElement(Resume r) {
 //      http://codereview.stackexchange.com/questions/36221/binary-search-for-inserting-in-array#answer-36239
         int index = Arrays.binarySearch(storage, 0, size, r);
         int insertIdx = -index - 1;
         System.arraycopy(storage, insertIdx, storage, insertIdx + 1, size - insertIdx);
         storage[insertIdx] = r;
-        size++;
     }
 
     @Override
-    protected void doUpdate(Object searchKey, Resume r) {
-        int index = (Integer) searchKey;
-        storage[index] = r;
-    }
-
-    @Override
-    protected void doDelete(Object searchKey) {
+    protected void deleteArrayElement(Object searchKey) {
         int index = (Integer) searchKey;
         int numMoved = size - 1 - index;
         if (numMoved > 0) {
             System.arraycopy(storage, index + 1, storage, index, numMoved);
         }
         storage[size - 1] = null;
-        size--;
     }
 }

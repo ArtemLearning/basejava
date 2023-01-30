@@ -5,26 +5,19 @@ import ru.javawebinar.basejava.exception.NotExistStorageException;
 import ru.javawebinar.basejava.model.Resume;
 
 public abstract class AbstractStorage implements Storage {
-    protected Resume[] storage = getStorage();
-    protected Object searchKey;
-    protected int size;
-
-    public final int size() {
-        return size;
-    }
 
     public final Resume get(String uuid) {
-        searchKey = getExistingSearchKey(uuid);
+        Object searchKey = getExistingSearchKey(uuid);
         return doGet(searchKey);
     }
 
     public final void save(Resume r) {
-        searchKey = getNotExistingSearchKey(r.getUuid());
+        Object searchKey = getNotExistingSearchKey(r.getUuid());
         doSave(r);
     }
 
     public final void update(Resume r) {
-        searchKey = getExistingSearchKey(r.getUuid());
+        Object searchKey = getExistingSearchKey(r.getUuid());
         doUpdate(searchKey, r);
     }
 
@@ -47,15 +40,9 @@ public abstract class AbstractStorage implements Storage {
         return null;
     }
 
-    public final void clear() {
-        clearStorage();
-    }
-
     protected abstract Resume[] getStorage();
 
     public abstract Resume[] getAll();
-
-    protected abstract void clearStorage();
 
     protected abstract Object getSearchKey(String uuid);
 

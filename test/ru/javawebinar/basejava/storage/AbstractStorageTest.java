@@ -107,25 +107,14 @@ public abstract class AbstractStorageTest {
     }
 
     @Test(expected = StorageException.class)
-    public void saveOverflow() {
-        storage.clear();
-        try {
-            for (int i = 0; i < AbstractArrayStorage.STORAGE_LIMIT; i++) {
-                String uuid = "uuid" + i;
-                storage.save(new Resume(uuid));
-            }
-        } catch (RuntimeException e) {
-            fail("Раннее переполнение");
-        }
-        storage.save(new Resume(UUID_NOT_EXIST));
-    }
+    public abstract void saveOverflow();
 
     @Test(expected = NotExistStorageException.class)
     public void deleteNotExist() {
         storage.delete(UUID_NOT_EXIST);
     }
 
-    private void assertSize(int expected) {
+    protected void assertSize(int expected) {
         assertEquals(expected, storage.size());
     }
 
