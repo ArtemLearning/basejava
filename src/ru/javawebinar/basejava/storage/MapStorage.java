@@ -5,6 +5,7 @@ import ru.javawebinar.basejava.model.Resume;
 import java.util.HashMap;
 import java.util.Map;
 
+// TODO create new MapStorage with search key not uuid
 public class MapStorage extends AbstractStorage {
     protected Map<String, Resume> storage = new HashMap<>();
 
