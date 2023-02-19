@@ -4,38 +4,40 @@ import ru.javawebinar.basejava.exception.ExistStorageException;
 import ru.javawebinar.basejava.exception.NotExistStorageException;
 import ru.javawebinar.basejava.model.Resume;
 
+import java.util.List;
+
 public abstract class AbstractStorage implements Storage {
 
-    public final Resume get(String uuid) {
-        Object searchKey = getExistingSearchKey(uuid);
+    public final Resume get(String uuid, String fullName) {
+        Object searchKey = getExistingSearchKey(uuid, fullName);
         return doGet(searchKey);
     }
 
     public final void save(Resume r) {
-        Object searchKey = getNotExistingSearchKey(r.getUuid());
+        Object searchKey = getNotExistingSearchKey(r.getUuid(), r.getFullName());
         doSave(r);
     }
 
     public final void update(Resume r) {
-        Object searchKey = getExistingSearchKey(r.getUuid());
+        Object searchKey = getExistingSearchKey(r.getUuid(), r.getFullName());
         doUpdate(searchKey, r);
     }
 
-    public final void delete(String uuid) {
-        Object searchKey = getExistingSearchKey(uuid);
+    public final void delete(String uuid, String fullName) {
+        Object searchKey = getExistingSearchKey(uuid, fullName);
         doDelete(searchKey);
     }
 
-    protected Object getExistingSearchKey(String uuid) {
-        Object searchKey = getSearchKey(uuid);
+    protected Object getExistingSearchKey(String uuid, String fullName) {
+        Object searchKey = getSearchKey(uuid, fullName);
         if (isExist(searchKey)) {
             return searchKey;
         }
         throw new NotExistStorageException(uuid);
     }
 
-    protected Object getNotExistingSearchKey(String uuid) {
-        Object searchKey = getSearchKey(uuid);
+    protected Object getNotExistingSearchKey(String uuid, String fullName) {
+        Object searchKey = getSearchKey(uuid, fullName);
         if (isExist(searchKey)) {
             throw new ExistStorageException(uuid);
         }
@@ -44,9 +46,9 @@ public abstract class AbstractStorage implements Storage {
 
     protected abstract Resume[] getStorage();
 
-    public abstract Resume[] getAll();
+    public abstract List<Resume> getAllSorted();
 
-    protected abstract Object getSearchKey(String uuid);
+    protected abstract Object getSearchKey(String uuid, String fullName);
 
     protected abstract boolean isExist(Object searchKey);
 

@@ -3,23 +3,22 @@ package ru.javawebinar.basejava.storage;
 import ru.javawebinar.basejava.model.Resume;
 
 import java.util.Arrays;
-import java.util.Comparator;
 
 public class SortedArrayStorage extends AbstractArrayStorage {
 
-    private static final Comparator<Resume> RESUME_COMPARATOR = Comparator.comparing(Resume::getUuid);
-
     @Override
-    protected Object getSearchKey(String uuid) {
+    protected Object getSearchKey(String uuid, String fullName) {
         if (size == 0) {
             return -1;
         }
-        Resume check = new Resume(uuid);
+        Resume check = new Resume(uuid, fullName);
         return Arrays.binarySearch(storage, 0, size, check, RESUME_COMPARATOR);
     }
-    @Override protected void saveArrayElement(Resume r) {
+
+    @Override
+    protected void saveArrayElement(Resume r) {
 //      http://codereview.stackexchange.com/questions/36221/binary-search-for-inserting-in-array#answer-36239
-        int index = Arrays.binarySearch(storage, 0, size, r);
+        int index = Arrays.binarySearch(storage, 0, size, r, RESUME_COMPARATOR);
         int insertIdx = -index - 1;
         System.arraycopy(storage, insertIdx, storage, insertIdx + 1, size - insertIdx);
         storage[insertIdx] = r;

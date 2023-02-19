@@ -1,18 +1,18 @@
 package ru.javawebinar.basejava;
 
 import ru.javawebinar.basejava.model.Resume;
-import ru.javawebinar.basejava.storage.MapStorage;
+import ru.javawebinar.basejava.storage.MapResumeStorage;
 
 /*
  Test for your com.urise.webapp.storage.ArrayStorage implementation
 */
 public class MainTestArrayStorage {
-    public static final MapStorage ARRAY_STORAGE = new MapStorage();
+    public static final MapResumeStorage ARRAY_STORAGE = new MapResumeStorage();
 
     public static void main(String[] args) {
-        final Resume r1 = new Resume("uuid1");
-        final Resume r2 = new Resume("uuid2");
-        final Resume r3 = new Resume("uuid3");
+        final Resume r1 = new Resume("uuid1", "Striker Eureka");
+        final Resume r2 = new Resume("uuid2", "Coyote Tango");
+        final Resume r3 = new Resume("uuid3", "Bracer Phoenix");
 
         //save
         try {
@@ -24,7 +24,7 @@ public class MainTestArrayStorage {
         }
 
         //get
-        System.out.println("Get r1: " + ARRAY_STORAGE.get(r1.getUuid()));
+        System.out.println("Get r1: " + ARRAY_STORAGE.get(r1.getUuid(), r1.getFullName()));
 
         //size
         System.out.println("Size: " + ARRAY_STORAGE.size());
@@ -38,7 +38,7 @@ public class MainTestArrayStorage {
 
         //dummy should return error
         try {
-            System.out.println("Get dummy: " + ARRAY_STORAGE.get("dummy"));
+            System.out.println("Get dummy: " + ARRAY_STORAGE.get("dummy", " "));
         } catch (RuntimeException e) {
             System.out.println(e.getMessage());
         }
@@ -47,7 +47,7 @@ public class MainTestArrayStorage {
 
         //delete
         try {
-            ARRAY_STORAGE.delete(r1.getUuid());
+            ARRAY_STORAGE.delete(r1.getUuid(), r1.getFullName());
         } catch (RuntimeException e) {
             System.out.println(e.getMessage());
         }
@@ -65,7 +65,7 @@ public class MainTestArrayStorage {
 
     static void printAll() {
         System.out.println("\nGet All");
-        for (Resume r : ARRAY_STORAGE.getAll()) {
+        for (Resume r : ARRAY_STORAGE.getAllSorted()) {
             System.out.println(r);
         }
     }

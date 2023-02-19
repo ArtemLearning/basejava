@@ -26,6 +26,7 @@ public class MainArray {
                 continue;
             }
             String uuid = null;
+            String fullName = " ";
             if (params.length == 2) {
                 uuid = params[1].intern();
             }
@@ -39,13 +40,13 @@ public class MainArray {
                 }
                 case "delete" -> {
                     try {
-                        ARRAY_STORAGE.delete(uuid);
+                        ARRAY_STORAGE.delete(uuid, fullName);
                     } catch (RuntimeException e) {
                         System.out.println(e.getMessage());
                     }
                     printAll();
                 }
-                case "get" -> System.out.println(ARRAY_STORAGE.get(uuid));
+                case "get" -> System.out.println(ARRAY_STORAGE.get(uuid, fullName));
                 case "clear" -> {
                     ARRAY_STORAGE.clear();
                     printAll();
@@ -59,7 +60,7 @@ public class MainArray {
     }
 
     static void printAll() {
-        Resume[] all = ARRAY_STORAGE.getAll();
+        Resume[] all = ARRAY_STORAGE.getAllSorted().toArray(new Resume[0]);
         System.out.println("----------------------------");
         if (all.length == 0) {
             System.out.println("Empty");
