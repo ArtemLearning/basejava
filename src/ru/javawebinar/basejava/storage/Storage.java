@@ -4,8 +4,6 @@ import ru.javawebinar.basejava.model.Resume;
 
 import java.util.List;
 
-// TODO refactor getAllSorted by fullName
-
 public interface Storage {
 
     void clear();

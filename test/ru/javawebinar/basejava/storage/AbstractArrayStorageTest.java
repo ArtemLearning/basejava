@@ -1,5 +1,6 @@
 package ru.javawebinar.basejava.storage;
 
+import org.junit.Test;
 import ru.javawebinar.basejava.model.Resume;
 
 import static org.junit.Assert.fail;
@@ -10,6 +11,7 @@ public abstract class AbstractArrayStorageTest extends AbstractStorageTest{
         super(storage);
     }
 
+    @Test(expected = RuntimeException.class )
     public void saveOverflow() {
         storage.clear();
         try {
