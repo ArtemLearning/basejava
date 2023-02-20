@@ -32,16 +32,17 @@ public class MapResumeStorage extends AbstractStorage {
 
     @Override
     protected Object getSearchKey(String searchKey, String fullName) {
-        if (isExist(searchKey)) {
-            return searchKey;
-        } else {
+        if (!isExist(searchKey)) {
             return null;
+        } else {
+            return searchKey;
         }
     }
 
     @Override
     protected boolean isExist(Object searchKey) {
-        return storage.containsKey(searchKey);
+        String key = (String) searchKey;
+        return storage.containsKey(key);
     }
 
     @Override
