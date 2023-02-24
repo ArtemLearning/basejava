@@ -3,7 +3,6 @@ package ru.javawebinar.basejava.storage;
 import ru.javawebinar.basejava.model.Resume;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class ListStorage extends AbstractStorage {
     protected ArrayList<Resume> storage = new ArrayList<>();
@@ -14,8 +13,8 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    public List<Resume> getAllSorted() {
-        return storage;
+    public Resume[] doCopyAll() {
+        return storage.toArray(new Resume[0]);
     }
 
     @Override
@@ -28,7 +27,7 @@ public class ListStorage extends AbstractStorage {
     @Override
     protected Object getSearchKey(String uuid, String fullName) {
         for (int i = 0; i < storage.size(); i++) {
-            if (uuid.equals(storage.get(i).getUuid()) && fullName.equals(storage.get(i).getFullName())) {
+            if (uuid.equals(storage.get(i).getUuid())) {
                 return i;
             }
         }
@@ -46,8 +45,9 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    protected void doSave(Resume r) {
-        storage.add(r);
+    protected void doSave(Object searchKey, Resume r) {
+        int index = (searchKey == null) ? 0 : (Integer) searchKey;
+        storage.add(index, r);
     }
 
     @Override

@@ -16,7 +16,7 @@ public class SortedArrayStorage extends AbstractArrayStorage {
     }
 
     @Override
-    protected void saveArrayElement(Resume r) {
+    protected void saveArrayElement(Object searchKey, Resume r) {
 //      http://codereview.stackexchange.com/questions/36221/binary-search-for-inserting-in-array#answer-36239
         int index = Arrays.binarySearch(storage, 0, size, r, RESUME_COMPARATOR);
         int insertIdx = -index - 1;

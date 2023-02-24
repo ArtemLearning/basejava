@@ -4,9 +4,13 @@ import ru.javawebinar.basejava.exception.ExistStorageException;
 import ru.javawebinar.basejava.exception.NotExistStorageException;
 import ru.javawebinar.basejava.model.Resume;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 public abstract class AbstractStorage implements Storage {
+
+    protected static final Comparator<Resume> RESUME_COMPARATOR = Comparator.comparing(Resume::getUuid).thenComparing(Resume::getFullName);
 
     public final Resume get(String uuid, String fullName) {
         Object searchKey = getExistingSearchKey(uuid, fullName);
@@ -15,7 +19,7 @@ public abstract class AbstractStorage implements Storage {
 
     public final void save(Resume r) {
         Object searchKey = getNotExistingSearchKey(r.getUuid(), r.getFullName());
-        doSave(r);
+        doSave(searchKey, r);
     }
 
     public final void update(Resume r) {
@@ -46,7 +50,13 @@ public abstract class AbstractStorage implements Storage {
 
     protected abstract Resume[] getStorage();
 
-    public abstract List<Resume> getAllSorted();
+    protected abstract Resume[] doCopyAll();
+
+    public List<Resume> getAllSorted() {
+        Resume[] resumes = doCopyAll();
+        Arrays.sort(resumes, 0, size(), RESUME_COMPARATOR);
+        return Arrays.asList(resumes).subList(0, size());
+    }
 
     protected abstract Object getSearchKey(String uuid, String fullName);
 
@@ -54,7 +64,7 @@ public abstract class AbstractStorage implements Storage {
 
     protected abstract Resume doGet(Object searchKey);
 
-    protected abstract void doSave(Resume r);
+    protected abstract void doSave(Object searchKey, Resume r);
 
     protected abstract void doUpdate(Object searchKey, Resume r);
 

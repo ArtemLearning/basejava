@@ -7,7 +7,7 @@ import ru.javawebinar.basejava.model.Resume;
     @Override
     protected Object getSearchKey(String uuid, String fullName) {
         for (int i = 0; i < size; i++) {
-            if (uuid.equals(storage[i].getUuid()) && fullName.equals(storage[i].getFullName())) {
+            if (uuid.equals(storage[i].getUuid())) {
                 return i;
             }
         }
@@ -15,7 +15,7 @@ import ru.javawebinar.basejava.model.Resume;
     }
 
     @Override
-    protected void saveArrayElement(Resume r) {
+    protected void saveArrayElement(Object searchKey, Resume r) {
         storage[size] = r;
     }
 
