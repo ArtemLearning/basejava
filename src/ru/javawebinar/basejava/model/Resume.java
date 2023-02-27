@@ -12,18 +12,16 @@ public class Resume {
     private final String fullName;
 
     public Resume() {
-        this.uuid = "";
-        this.fullName = "";
-        new Resume(null);
+        this(null);
     }
 
     public Resume(String fullName) {
-        this.uuid = (UUID.randomUUID().toString());
-        this.fullName = fullName;
-        new Resume(this.uuid, this.fullName);
+        this((UUID.randomUUID().toString()), fullName);
     }
 
     public Resume(String uuid, String fullName) {
+        Objects.requireNonNull(uuid, "Uuid должен быть заполнен");
+        Objects.requireNonNull(fullName, "fullName должен быть заполнен");
         this.uuid = uuid;
         this.fullName = fullName;
     }
@@ -44,13 +42,18 @@ public class Resume {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+
         Resume resume = (Resume) o;
-        return Objects.equals(uuid, resume.uuid) && Objects.equals(fullName, resume.fullName);
+
+        if (!uuid.equals(resume.uuid)) return false;
+        return fullName.equals(resume.fullName);
     }
 
     @Override
     public int hashCode() {
-        return uuid != null ? uuid.hashCode() : 0;
+        int result = uuid.hashCode();
+        result = 31 * result + fullName.hashCode();
+        return result;
     }
 
     @Override
