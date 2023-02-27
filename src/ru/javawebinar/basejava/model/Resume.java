@@ -13,8 +13,8 @@ public class Resume {
 
     public Resume() {
         this.uuid = "";
-        this.fullName = "John Doe";
-        new Resume(this.fullName);
+        this.fullName = "";
+        new Resume(null);
     }
 
     public Resume(String fullName) {

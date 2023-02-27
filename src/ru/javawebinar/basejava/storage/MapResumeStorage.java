@@ -5,6 +5,8 @@ import ru.javawebinar.basejava.model.Resume;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.util.Objects.isNull;
+
 public class MapResumeStorage extends AbstractStorage {
 
     private final Map<String, Resume> storage = new HashMap<>();
@@ -36,12 +38,7 @@ public class MapResumeStorage extends AbstractStorage {
 
     @Override
     protected boolean isExist(Object searchKey) {
-        if (searchKey == null) {
-            return false;
-        } else {
-            Resume key = (Resume) searchKey;
-            return storage.containsKey(key.getUuid());
-        }
+        return isNull(searchKey);
     }
 
     @Override
