@@ -1,15 +1,18 @@
 package ru.javawebinar.basejava.model;
 
+import java.util.EnumMap;
 import java.util.Objects;
 import java.util.UUID;
 
 /**
  * Initial resume class
  */
-public class Resume {
+public class Resume extends AbstractSection {
     // Unique identifier
     private final String uuid;
     private final String fullName;
+    private EnumMap<ContactType, String> contacts = new EnumMap<>(ContactType.class);
+    private EnumMap<SectionType, AbstractSection> sections = new EnumMap<>(SectionType.class);
 
     public Resume() {
         this(null);
@@ -34,8 +37,12 @@ public class Resume {
         return fullName;
     }
 
-    public String getFullKey() {
-        return fullName + uuid;
+    public EnumMap<ContactType, String> getContacts() {
+        return contacts;
+    }
+
+    public EnumMap<SectionType, AbstractSection> getSections() {
+        return sections;
     }
 
     @Override
@@ -58,6 +65,11 @@ public class Resume {
 
     @Override
     public String toString() {
-        return uuid + " " + fullName;
+        return "Resume{" +
+                "uuid='" + uuid + '\'' +
+                ", fullName='" + fullName + '\'' +
+                ", contacts=" + contacts +
+                ", sections=" + sections +
+                '}';
     }
 }
