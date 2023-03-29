@@ -11,8 +11,8 @@ public class Resume extends AbstractSection {
     // Unique identifier
     private final String uuid;
     private final String fullName;
-    private EnumMap<ContactType, String> contacts = new EnumMap<>(ContactType.class);
-    private EnumMap<SectionType, AbstractSection> sections = new EnumMap<>(SectionType.class);
+    private final EnumMap<ContactType, String> contacts = new EnumMap<>(ContactType.class);
+    private final EnumMap<SectionType, AbstractSection> sections = new EnumMap<>(SectionType.class);
 
     public Resume() {
         this(null);
