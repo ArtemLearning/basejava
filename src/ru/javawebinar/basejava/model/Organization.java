@@ -1,55 +1,60 @@
 package ru.javawebinar.basejava.model;
 
-import java.util.List;
+import java.time.LocalDate;
 import java.util.Objects;
 
 public class Organization {
-    private final String name;
-    private final String job;
-    private final List<Period> periods;
-    private final String website;
+    private final Link homePage;
 
-    public Organization(String name, String job, List<Period> periods, String website) {
-        this.name = name;
-        this.job = job;
-        this.periods = periods;
-        this.website = website;
-    }
+    private final LocalDate startDate;
+    private final LocalDate endDate;
+    private final String title;
+    private final String description;
 
-    public String getName() {
-        return name;
-    }
-
-    public String getJob() {
-        return job;
-    }
-
-    public String getWebsite() {
-        return website;
-    }
-
-    public List<Period> getPeriods() {
-        return periods;
+    public Organization(String name, String url, LocalDate startDate, LocalDate endDate, String title, String description) {
+        Objects.requireNonNull(startDate, "startDate must not be null");
+        Objects.requireNonNull(endDate, "endDate must not be null");
+        Objects.requireNonNull(title, "title must not be null");
+        this.homePage = new Link(name, url);
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.title = title;
+        this.description = description;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+
         Organization that = (Organization) o;
-        return Objects.equals(name, that.name) && Objects.equals(job, that.job) && Objects.equals(periods, that.periods) && Objects.equals(website, that.website);
+
+        if (!homePage.equals(that.homePage)) return false;
+        if (!startDate.equals(that.startDate)) return false;
+        if (!endDate.equals(that.endDate)) return false;
+        if (!title.equals(that.title)) return false;
+        return description != null ? description.equals(that.description) : that.description == null;
+
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, job, periods, website);
+        int result = homePage.hashCode();
+        result = 31 * result + startDate.hashCode();
+        result = 31 * result + endDate.hashCode();
+        result = 31 * result + title.hashCode();
+        result = 31 * result + (description != null ? description.hashCode() : 0);
+        return result;
     }
 
     @Override
     public String toString() {
-        return  name + '\n' +
-                job + '\n' +
-                periods + '\n' +
-                website + '\n';
+        return "Organization{" +
+                "homePage=" + homePage +
+                ", startDate=" + startDate +
+                ", endDate=" + endDate +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                '}';
     }
 }

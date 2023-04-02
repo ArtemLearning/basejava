@@ -5,35 +5,57 @@ import ru.javawebinar.basejava.model.Resume;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public abstract class AbstractFileStorage extends AbstractStorage<File> {
-    private File directory;
+    private final File directory;
 
     protected AbstractFileStorage(File directory) {
-        Objects.requireNonNull(directory, "directory should be filled");
+        Objects.requireNonNull(directory, "directory must not be null");
         if (!directory.isDirectory()) {
-            throw new IllegalArgumentException(directory.getAbsolutePath() + "is not directory");
+            throw new IllegalArgumentException(directory.getAbsolutePath() + " is not directory");
         }
         if (!directory.canRead() || !directory.canWrite()) {
-            throw new IllegalArgumentException(directory.getAbsolutePath() + "is not readable/writeable");
+            throw new IllegalArgumentException(directory.getAbsolutePath() + " is not readable/writable");
         }
         this.directory = directory;
     }
 
     @Override
-    protected Resume[] getStorage() {
-        return new Resume[0];
+    public void clear() {
+        File[] list = directory.listFiles();
+        if (list != null) {
+            for (File name : list) {
+                if (!name.delete()) {
+                    throw new IllegalArgumentException(name.getAbsolutePath() + " cannot be deleted");
+                }
+            }
+        }
+        if (!directory.delete()) {
+            throw new IllegalArgumentException(directory.getAbsolutePath() + " cannot be deleted");
+        }
     }
 
     @Override
-    protected Resume[] doCopyAll() {
-        return new Resume[0];
+    public int size() {
+        String[] list = directory.list();
+        return (list == null) ? 0 : list.length;
     }
 
     @Override
-    protected Object getSearchKey(String uuid, String fullName) {
+    protected File getSearchKey(String uuid) {
         return new File(directory, uuid);
+    }
+
+    @Override
+    protected void doUpdate(Resume r, File file) {
+        try {
+            doWrite(r, file);
+        } catch (IOException e) {
+            throw new StorageException("IO error", file.getName(), e);
+        }
     }
 
     @Override
@@ -42,39 +64,45 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
     }
 
     @Override
-    protected Resume doGet(Object searchKey) {
-        return null;
-    }
-
-    @Override
-    protected void doSave(File file, Resume r) {
+    protected void doSave(Resume r, File file) {
         try {
-            file.createNewFile();
-            doWrite(file, r);
+            if (file.createNewFile()) {
+                doWrite(r, file);
+            }
         } catch (IOException e) {
             throw new StorageException("IO error", file.getName(), e);
         }
     }
 
-    protected abstract void doWrite(File file, Resume r) throws IOException;
-
     @Override
-    protected void doUpdate(Object searchKey, Resume r) {
-
+    protected Resume doGet(File file) {
+        return doRead(file);
     }
 
     @Override
-    protected void doDelete(Object searchKey) {
-
+    protected void doDelete(File file) {
+        if (!file.delete()) {
+            throw new IllegalArgumentException(directory.getAbsolutePath() + " cannot be deleted");
+        }
     }
 
     @Override
-    public void clear() {
-
+    protected List<Resume> doCopyAll() {
+        List<Resume> records = new ArrayList<>();
+        File[] list = directory.listFiles();
+        if (list != null) {
+            for (File name : list) {
+                records.add(doRead(name));
+            }
+        }
+        return records;
     }
 
-    @Override
-    public int size() {
-        return 0;
-    }
+    protected abstract void doWrite(Resume r, File file) throws IOException;
+
+    protected abstract Resume doRead(File file);
 }
+
+
+
+

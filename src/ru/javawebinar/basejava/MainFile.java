@@ -1,11 +1,51 @@
 package ru.javawebinar.basejava;
 
 import java.io.File;
-import java.io.IOException;
 
 public class MainFile {
-    public static void main(String[] args) throws IOException {
-        File file = new File("C:\\TEMP\\123.txt");
-        System.out.println(file.getCanonicalPath());
+    public static void getAllFiles(File path) {
+        if (!path.isDirectory()) {
+            System.out.println("Not a directory");
+            return;
+        }
+
+        File[] list = path.listFiles();
+        if (list == null) {
+            return;
+        }
+        for (File file : list) {
+            if (file.isDirectory()) {
+                getAllFiles(file);
+                System.out.println("Folder: " + file.getAbsoluteFile());
+            } else {
+                System.out.println("File: " + file.getAbsoluteFile());
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+//        String filePath = ".\\.gitignore";
+//
+//        File file = new File(filePath);
+//        try {
+//            System.out.println(file.getCanonicalPath());
+//        } catch (IOException e) {
+//            throw new RuntimeException("Error", e);
+//        }
+        File dir = new File(".\\");
+//        System.out.println(dir.isDirectory());
+//        String[] list = dir.list();
+//        if (list != null) {
+//            for (String name : list) {
+//                System.out.println(name);
+//            }
+//        }
+//        try (FileInputStream fis = new FileInputStream(filePath)) {
+//            System.out.println(fis.read());
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+
+        getAllFiles(dir);
     }
 }

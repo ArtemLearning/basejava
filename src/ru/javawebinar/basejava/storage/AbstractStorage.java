@@ -4,69 +4,75 @@ import ru.javawebinar.basejava.exception.ExistStorageException;
 import ru.javawebinar.basejava.exception.NotExistStorageException;
 import ru.javawebinar.basejava.model.Resume;
 
-import java.util.Arrays;
-import java.util.Comparator;
+import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 
-public abstract class AbstractStorage implements Storage {
+public abstract class AbstractStorage<SK> implements Storage {
 
-    protected static final Comparator<Resume> RESUME_COMPARATOR = Comparator.comparing(Resume::getUuid).thenComparing(Resume::getFullName);
+    private static final Logger LOG = Logger.getLogger(AbstractStorage.class.getName());
 
-    public final Resume get(String uuid, String fullName) {
-        Object searchKey = getExistingSearchKey(uuid, fullName);
-        return doGet(searchKey);
+    protected abstract SK getSearchKey(String uuid);
+
+    protected abstract void doUpdate(Resume r, SK searchKey);
+
+    protected abstract boolean isExist(SK searchKey);
+
+    protected abstract void doSave(Resume r, SK searchKey);
+
+    protected abstract Resume doGet(SK searchKey);
+
+    protected abstract void doDelete(SK searchKey);
+
+    protected abstract List<Resume> doCopyAll();
+
+    public void update(Resume r) {
+        LOG.info("Update " + r);
+        SK searchKey = getExistedSearchKey(r.getUuid());
+        doUpdate(r, searchKey);
     }
 
-    public final void save(Resume r) {
-        Object searchKey = getNotExistingSearchKey(r.getUuid(), r.getFullName());
-        doSave(searchKey, r);
+    public void save(Resume r) {
+        LOG.info("Save " + r);
+        SK searchKey = getNotExistedSearchKey(r.getUuid());
+        doSave(r, searchKey);
     }
 
-    public final void update(Resume r) {
-        Object searchKey = getExistingSearchKey(r.getUuid(), r.getFullName());
-        doUpdate(searchKey, r);
-    }
-
-    public final void delete(String uuid, String fullName) {
-        Object searchKey = getExistingSearchKey(uuid, fullName);
+    public void delete(String uuid) {
+        LOG.info("Delete " + uuid);
+        SK searchKey = getExistedSearchKey(uuid);
         doDelete(searchKey);
     }
 
-    protected Object getExistingSearchKey(String uuid, String fullName) {
-        Object searchKey = getSearchKey(uuid, fullName);
-        if (isExist(searchKey)) {
-            return searchKey;
-        }
-        throw new NotExistStorageException(uuid);
+    public Resume get(String uuid) {
+        LOG.info("Get " + uuid);
+        SK searchKey = getExistedSearchKey(uuid);
+        return doGet(searchKey);
     }
 
-    protected Object getNotExistingSearchKey(String uuid, String fullName) {
-        Object searchKey = getSearchKey(uuid, fullName);
+    private SK getExistedSearchKey(String uuid) {
+        SK searchKey = getSearchKey(uuid);
+        if (!isExist(searchKey)) {
+            LOG.warning("Resume " + uuid + " not exist");
+            throw new NotExistStorageException(uuid);
+        }
+        return searchKey;
+    }
+
+    private SK getNotExistedSearchKey(String uuid) {
+        SK searchKey = getSearchKey(uuid);
         if (isExist(searchKey)) {
+            LOG.warning("Resume " + uuid + " already exist");
             throw new ExistStorageException(uuid);
         }
-        return null;
+        return searchKey;
     }
 
-    protected abstract Resume[] getStorage();
-
-    protected abstract Resume[] doCopyAll();
-
+    @Override
     public List<Resume> getAllSorted() {
-        Resume[] resumes = doCopyAll();
-        Arrays.sort(resumes, 0, size(), RESUME_COMPARATOR);
-        return Arrays.asList(resumes).subList(0, size());
+        LOG.info("getAllSorted");
+        List<Resume> list = doCopyAll();
+        Collections.sort(list);
+        return list;
     }
-
-    protected abstract Object getSearchKey(String uuid, String fullName);
-
-    protected abstract boolean isExist(Object searchKey);
-
-    protected abstract Resume doGet(Object searchKey);
-
-    protected abstract void doSave(Object searchKey, Resume r);
-
-    protected abstract void doUpdate(Object searchKey, Resume r);
-
-    protected abstract void doDelete(Object searchKey);
 }

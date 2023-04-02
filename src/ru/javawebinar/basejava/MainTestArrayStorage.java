@@ -1,65 +1,34 @@
 package ru.javawebinar.basejava;
 
 import ru.javawebinar.basejava.model.Resume;
-import ru.javawebinar.basejava.storage.MapResumeStorage;
+import ru.javawebinar.basejava.storage.ArrayStorage;
 
 /*
  Test for your com.urise.webapp.storage.ArrayStorage implementation
 */
 public class MainTestArrayStorage {
-    public static final MapResumeStorage ARRAY_STORAGE = new MapResumeStorage();
+    static final ArrayStorage ARRAY_STORAGE = new ArrayStorage();
 
     public static void main(String[] args) {
-        final Resume r1 = new Resume("uuid1", "Striker Eureka");
-        final Resume r2 = new Resume("uuid2", "Coyote Tango");
-        final Resume r3 = new Resume("uuid3", "Bracer Phoenix");
+        Resume r1 = new Resume("uuid1");
+        Resume r2 = new Resume("uuid2");
+        Resume r3 = new Resume("uuid3");
 
-        //save
-        try {
-            ARRAY_STORAGE.save(r1);
-            ARRAY_STORAGE.save(r2);
-            ARRAY_STORAGE.save(r3);
-        } catch (RuntimeException e) {
-            System.out.println(e.getMessage());
-        }
+        ARRAY_STORAGE.save(r1);
+        ARRAY_STORAGE.save(r2);
+        ARRAY_STORAGE.save(r3);
 
-        //get
-        System.out.println("Get r1: " + ARRAY_STORAGE.get(r1.getUuid(), r1.getFullName()));
-
-        //size
+        System.out.println("Get r1: " + ARRAY_STORAGE.get(r1.getUuid()));
         System.out.println("Size: " + ARRAY_STORAGE.size());
 
-        //update
-        try {
-            ARRAY_STORAGE.update(r1);
-        } catch (RuntimeException e) {
-            System.out.println(e.getMessage());
-        }
-
-        //dummy should return error
-        try {
-            System.out.println("Get dummy: " + ARRAY_STORAGE.get("dummy", " "));
-        } catch (RuntimeException e) {
-            System.out.println(e.getMessage());
-        }
+        System.out.println("Get dummy: " + ARRAY_STORAGE.get("dummy"));
 
         printAll();
-
-        //delete
-        try {
-            ARRAY_STORAGE.delete(r1.getUuid(), r1.getFullName());
-        } catch (RuntimeException e) {
-            System.out.println(e.getMessage());
-        }
-
+        ARRAY_STORAGE.delete(r1.getUuid());
         printAll();
-
-        //clear
         ARRAY_STORAGE.clear();
-
         printAll();
 
-        //size after clear
         System.out.println("Size: " + ARRAY_STORAGE.size());
     }
 

@@ -2,10 +2,10 @@ package ru.javawebinar.basejava.storage;
 
 import static org.junit.Assert.assertEquals;
 
-public class MapStorageTest extends AbstractStorageTest {
-    private static final Storage storage = new MapStorage();
+public class MapUuidStorageTest extends AbstractStorageTest {
+    private static final Storage storage = new MapUuidStorage();
 
-    public MapStorageTest() {
+    public MapUuidStorageTest() {
         super(storage);
     }
 
