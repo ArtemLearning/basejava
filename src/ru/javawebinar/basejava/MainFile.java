@@ -8,7 +8,6 @@ public class MainFile {
             System.out.println("Not a directory");
             return;
         }
-
         File[] list = path.listFiles();
         if (list == null) {
             return;
@@ -16,9 +15,9 @@ public class MainFile {
         for (File file : list) {
             if (file.isDirectory()) {
                 getAllFiles(file);
-                System.out.println("Folder: " + file.getAbsoluteFile());
+                System.out.println("Folder: " + file.getPath());
             } else {
-                System.out.println("File: " + file.getAbsoluteFile());
+                System.out.println("File: " + file.getPath());
             }
         }
     }
@@ -32,8 +31,8 @@ public class MainFile {
 //        } catch (IOException e) {
 //            throw new RuntimeException("Error", e);
 //        }
-        File dir = new File(".\\");
-//        System.out.println(dir.isDirectory());
+        File dir = new File(".\\src\\ru\\javawebinar\\basejava\\model");
+//        System.out.println(dir.getAbsolutePath());
 //        String[] list = dir.list();
 //        if (list != null) {
 //            for (String name : list) {
@@ -45,7 +44,6 @@ public class MainFile {
 //        } catch (IOException e) {
 //            throw new RuntimeException(e);
 //        }
-
         getAllFiles(dir);
     }
 }

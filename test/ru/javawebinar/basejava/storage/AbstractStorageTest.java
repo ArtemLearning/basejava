@@ -10,14 +10,15 @@ import ru.javawebinar.basejava.model.Resume;
 import java.util.List;
 
 import static org.junit.Assert.*;
+import static ru.javawebinar.basejava.ResumeTestData.fillTestResume;
 
 public abstract class AbstractStorageTest {
     protected static final String UUID_1 = "uuid1";
     protected static final String UUID_2 = "uuid2";
     protected static final String UUID_3 = "uuid3";
-    protected static final String FULL_NAME1 = "Striker Eureka";
+    protected static final String FULL_NAME1 = "Bracer Phoenix";
     protected static final String FULL_NAME2 = "Coyote Tango";
-    protected static final String FULL_NAME3 = "Bracer Phoenix";
+    protected static final String FULL_NAME3 = "Striker Eureka";
     protected static final String UUID_NOT_EXIST = "dummy";
     protected static final String SPACE = "";
     protected static final Resume RESUME_1;
@@ -27,9 +28,9 @@ public abstract class AbstractStorageTest {
     protected static final Resume REF_RESUME;
 
     static {
-        RESUME_1 = new Resume(UUID_1, FULL_NAME1);
-        RESUME_2 = new Resume(UUID_2, FULL_NAME2);
-        RESUME_3 = new Resume(UUID_3, FULL_NAME3);
+        RESUME_1 = fillTestResume(UUID_1, FULL_NAME1);
+        RESUME_2 = fillTestResume(UUID_2, FULL_NAME2);
+        RESUME_3 = fillTestResume(UUID_3, FULL_NAME3);
         expectedStorage = new Resume[]{RESUME_1, RESUME_2, RESUME_3};
         REF_RESUME = new Resume("refUuid");
     }
