@@ -28,20 +28,21 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
         File[] list = directory.listFiles();
         if (list != null) {
             for (File name : list) {
-                if (!name.delete()) {
-                    throw new IllegalArgumentException(name.getAbsolutePath() + " cannot be deleted");
-                }
+                doDelete(name);
             }
+        } else {
+            throw new StorageException("Filesystem error", directory.getName());
         }
-        if (!directory.delete()) {
-            throw new IllegalArgumentException(directory.getAbsolutePath() + " cannot be deleted");
-        }
+        doDelete(directory);
     }
 
     @Override
     public int size() {
         String[] list = directory.list();
-        return (list == null) ? 0 : list.length;
+        if (list == null) {
+            throw new StorageException("Filesystem error", directory.getName());
+        }
+        return list.length;
     }
 
     @Override
@@ -76,13 +77,19 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
 
     @Override
     protected Resume doGet(File file) {
-        return doRead(file);
+        Resume r;
+        try {
+            r = doRead(file);
+        } catch (IOException e) {
+            throw new StorageException("IO error", file.getName(), e);
+        }
+        return r;
     }
 
     @Override
     protected void doDelete(File file) {
         if (!file.delete()) {
-            throw new IllegalArgumentException(directory.getAbsolutePath() + " cannot be deleted");
+            throw new StorageException("Cannot delete directory", directory.getAbsolutePath());
         }
     }
 
@@ -92,15 +99,17 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
         File[] list = directory.listFiles();
         if (list != null) {
             for (File name : list) {
-                records.add(doRead(name));
+                records.add(doGet(name));
             }
+        } else {
+            throw new StorageException("Filesystem error", directory.getName());
         }
         return records;
     }
 
     protected abstract void doWrite(Resume r, File file) throws IOException;
 
-    protected abstract Resume doRead(File file);
+    protected abstract Resume doRead(File file) throws IOException;
 }
 
 
