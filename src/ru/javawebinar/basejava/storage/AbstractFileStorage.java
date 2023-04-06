@@ -23,6 +23,10 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
         this.directory = directory;
     }
 
+    protected abstract void doWrite(Resume r, File file) throws IOException;
+
+    protected abstract Resume doRead(File file) throws IOException;
+
     @Override
     public void clear() {
         File[] list = directory.listFiles();
@@ -95,21 +99,17 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
 
     @Override
     protected List<Resume> doCopyAll() {
-        List<Resume> records = new ArrayList<>();
+        List<Resume> resumes = new ArrayList<>();
         File[] list = directory.listFiles();
         if (list != null) {
             for (File name : list) {
-                records.add(doGet(name));
+                resumes.add(doGet(name));
             }
         } else {
             throw new StorageException("Filesystem error", directory.getName());
         }
-        return records;
+        return resumes;
     }
-
-    protected abstract void doWrite(Resume r, File file) throws IOException;
-
-    protected abstract Resume doRead(File file) throws IOException;
 }
 
 
