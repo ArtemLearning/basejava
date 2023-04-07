@@ -127,13 +127,13 @@ public class ResumeTestData {
                 qualificationThree));
         fillSectionQualifications(qualificationData);
         // Опыт работы
-        Period jobOne = new Period(LocalDate.of(2014, Month.OCTOBER, 1),
+        Organization.Position jobOne = new Organization.Position(LocalDate.of(2014, Month.OCTOBER, 1),
                 LocalDate.of(2016, Month.JANUARY, 1),
                 "Старший разработчик (backend)",
                 "Проектирование и разработка онлайн платформы управления проектами Wrike (Java 8 API, Maven, Spring, " +
                         "MyBatis, Guava, Vaadin, PostgreSQL, Redis). Двухфакторная аутентификация, авторизация по " +
                         "OAuth1, OAuth2, JWT SSO.");
-        Period jobTwo = new Period(LocalDate.of(2012, Month.APRIL, 1),
+        Organization.Position jobTwo = new Organization.Position(LocalDate.of(2012, Month.APRIL, 1),
                 LocalDate.of(2014, Month.OCTOBER, 1),
                 "Java архитектор",
                 "Организация процесса разработки системы ERP для разных окружений: релизная политика, версионирование," +
@@ -144,14 +144,14 @@ public class ResumeTestData {
                         "браузера документов MS Office. Maven + plugin development, Ant, Apache Commons, " +
                         "Spring security, Spring MVC, Tomcat,WSO2, xcmis, OpenCmis, Bonita, Python scripting, " +
                         "Unix shell remote scripting via ssh tunnels, PL/Python");
-        Period jobThree = new Period(LocalDate.of(2010, Month.DECEMBER, 1),
+        Organization.Position jobThree = new Organization.Position(LocalDate.of(2010, Month.DECEMBER, 1),
                 LocalDate.of(2012, Month.APRIL, 1),
                 "Ведущий программист",
                 "Участие в проекте Deutsche Bank CRM (WebLogic, Hibernate, Spring, Spring MVC, SmartGWT, GWT, Jasper, " +
                         "Oracle). Реализация клиентской и серверной части CRM. Реализация RIA-приложения для " +
                         "администрирования, мониторинга и анализа результатов в области алгоритмического трейдинга. " +
                         "JPA, Spring, Spring-MVC, GWT, ExtGWT (GXT), Highstock, Commet, HTML5.");
-        List<Period> jobList = List.of(jobOne);
+        List<Organization.Position> jobList = List.of(jobOne);
         Organization organizationOne = new Organization("Wrike", "https://www.wrike.com/", jobList);
         jobList = List.of(jobTwo);
         Organization organizationTwo = new Organization("RIT Center", "-", jobList);
@@ -161,13 +161,13 @@ public class ResumeTestData {
         OrganizationSection experienceData = new OrganizationSection(experience);
         fillSectionExperience(experienceData);
         //Образование
-        Period learnOne = new Period(LocalDate.of(1987, Month.SEPTEMBER, 1),
+        Organization.Position learnOne = new Organization.Position(LocalDate.of(1987, Month.SEPTEMBER, 1),
                 LocalDate.of(1993, Month.JULY, 1), "Инженер (программист Fortran, C)", "-");
-        Period learnTwo = new Period(LocalDate.of(1993, Month.SEPTEMBER, 1), LocalDate.of(1996, Month.JULY, 1),
+        Organization.Position learnTwo = new Organization.Position(LocalDate.of(1993, Month.SEPTEMBER, 1), LocalDate.of(1996, Month.JULY, 1),
                 "Аспирантура (программист С, С++)", "-");
-        Period learnThree = new Period(LocalDate.of(1996, Month.SEPTEMBER, 1), LocalDate.of(1998, Month.MARCH, 1),
+        Organization.Position learnThree = new Organization.Position(LocalDate.of(1996, Month.SEPTEMBER, 1), LocalDate.of(1998, Month.MARCH, 1),
                 "6 месяцев обучения цифровым телефонным сетям (Москва)", "-");
-        List<Period> learnList = List.of(learnOne, learnTwo);
+        List<Organization.Position> learnList = List.of(learnOne, learnTwo);
         Organization schoolOne = new Organization("Санкт-Петербургский национальный исследовательский университет " +
                 "информационных технологий, механики и оптики", "http://www.ifmo.ru/",
                 learnList);

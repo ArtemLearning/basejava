@@ -19,9 +19,9 @@ public class MapResumeStorageTest extends AbstractStorageTest {
     @Override
     public void getAllSorted() {
         assertEquals(3, storage.size());
-        assertEquals(RESUME_1, storage.get(UUID_1));
-        assertEquals(RESUME_2, storage.get(UUID_2));
-        assertEquals(RESUME_3, storage.get(UUID_3));
+        assertEquals(R1, storage.get(UUID_1));
+        assertEquals(R2, storage.get(UUID_2));
+        assertEquals(R3, storage.get(UUID_3));
 
     }
 
