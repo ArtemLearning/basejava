@@ -23,10 +23,6 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> implemen
         }
     }
 
-//    protected abstract void doWrite(Resume r, OutputStream os) throws IOException;
-//
-//    protected abstract Resume doRead(InputStream is) throws IOException;
-
     @Override
     public void clear() {
         File[] list = directory.listFiles();

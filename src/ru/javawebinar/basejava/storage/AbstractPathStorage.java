@@ -17,10 +17,6 @@ public abstract class AbstractPathStorage extends AbstractStorage<Path> implemen
     private final Path directory;
     SerializationStrategy strategy;
 
-//    protected abstract void doWrite(Resume r, OutputStream os) throws IOException;
-//
-//    protected abstract Resume doRead(InputStream is) throws IOException;
-
     protected AbstractPathStorage(String dir) {
         directory = Paths.get(dir);
         Objects.requireNonNull(directory, "directory must not be null");
@@ -56,7 +52,7 @@ public abstract class AbstractPathStorage extends AbstractStorage<Path> implemen
     @Override
     protected void doUpdate(Resume r, Path path) {
         try {
-            doWrite(r, new BufferedOutputStream(Files.newOutputStream(path)));
+            strategy.doWrite(r, new BufferedOutputStream(Files.newOutputStream(path)));
         } catch (IOException e) {
             throw new StorageException("Path write error", r.getUuid());
         }
@@ -83,7 +79,7 @@ public abstract class AbstractPathStorage extends AbstractStorage<Path> implemen
     @Override
     protected Resume doGet(Path path) {
         try {
-            return doRead(new BufferedInputStream(Files.newInputStream(path)));
+            return strategy.doRead(new BufferedInputStream(Files.newInputStream(path)));
         } catch (IOException e) {
             throw new StorageException("Path read error", path.getFileName().toString());
         }
