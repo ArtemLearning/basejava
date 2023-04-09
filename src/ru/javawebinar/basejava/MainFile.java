@@ -3,7 +3,10 @@ package ru.javawebinar.basejava;
 import java.io.File;
 
 public class MainFile {
+    private static int deepRecursion = 0;
+
     public static void getAllFiles(File path) {
+
         if (!path.isDirectory()) {
             System.out.println("Not a directory");
             return;
@@ -14,10 +17,18 @@ public class MainFile {
         }
         for (File file : list) {
             if (file.isDirectory()) {
+                for (int i = 0; i < deepRecursion; i++) {
+                    System.out.print('\t');
+                }
+                System.out.print("Folder: " + file.getPath() + '\n');
+                deepRecursion++;
                 getAllFiles(file);
-                System.out.println("Folder: " + file.getPath());
+                deepRecursion = 0;
             } else {
-                System.out.println("File: " + file.getPath());
+                for (int i = 0; i < deepRecursion; i++) {
+                    System.out.print('\t');
+                }
+                System.out.print("File: " + file.getPath() + '\n');
             }
         }
     }
@@ -31,7 +42,7 @@ public class MainFile {
 //        } catch (IOException e) {
 //            throw new RuntimeException("Error", e);
 //        }
-        File dir = new File(".\\src\\ru\\javawebinar\\basejava\\model");
+        File dir = new File(".\\src\\ru\\javawebinar\\basejava");
 //        System.out.println(dir.getAbsolutePath());
 //        String[] list = dir.list();
 //        if (list != null) {
