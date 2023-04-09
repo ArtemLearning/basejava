@@ -8,9 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class AbstractFileStorage extends AbstractStorage<File> implements SerializationStrategy {
+public abstract class AbstractFileStorage extends AbstractStorage<File> {
     private final File directory;
-    SerializationStrategy strategy;
 
     protected AbstractFileStorage(String dir) {
         directory = new File(dir);
@@ -22,6 +21,10 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> implemen
             throw new IllegalArgumentException(directory.getAbsolutePath() + " is not readable/writable");
         }
     }
+
+    abstract void doWrite(Resume r, OutputStream os) throws IOException;
+
+    abstract Resume doRead(InputStream is) throws IOException;
 
     @Override
     public void clear() {
@@ -52,7 +55,7 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> implemen
     @Override
     protected void doUpdate(Resume r, File file) {
         try {
-            strategy.doWrite(r, new BufferedOutputStream(new FileOutputStream(file)));
+            doWrite(r, new BufferedOutputStream(new FileOutputStream(file)));
         } catch (IOException e) {
             throw new StorageException("IO error", file.getName(), e);
         }
@@ -67,7 +70,7 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> implemen
     protected void doSave(Resume r, File file) {
         try {
             if (file.createNewFile()) {
-                strategy.doWrite(r, new BufferedOutputStream(new FileOutputStream(file)));
+                doWrite(r, new BufferedOutputStream(new FileOutputStream(file)));
             }
         } catch (IOException e) {
             throw new StorageException("IO error", file.getName(), e);
@@ -78,7 +81,7 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> implemen
     protected Resume doGet(File file) {
         Resume r;
         try {
-            r = strategy.doRead(new BufferedInputStream(new FileInputStream(file)));
+            r = doRead(new BufferedInputStream(new FileInputStream(file)));
         } catch (IOException e) {
             throw new StorageException("IO error", file.getName(), e);
         }

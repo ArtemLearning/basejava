@@ -3,9 +3,7 @@ package ru.javawebinar.basejava.storage;
 import ru.javawebinar.basejava.exception.StorageException;
 import ru.javawebinar.basejava.model.Resume;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -13,9 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class AbstractPathStorage extends AbstractStorage<Path> implements SerializationStrategy {
+public abstract class AbstractPathStorage extends AbstractStorage<Path>{
     private final Path directory;
-    SerializationStrategy strategy;
 
     protected AbstractPathStorage(String dir) {
         directory = Paths.get(dir);
@@ -24,7 +21,9 @@ public abstract class AbstractPathStorage extends AbstractStorage<Path> implemen
             throw new IllegalArgumentException(dir + " is not directory or is not writable");
         }
     }
+    abstract void doWrite(Resume r, OutputStream os) throws IOException;
 
+    abstract Resume doRead(InputStream is) throws IOException;
     @Override
     public void clear() {
         try {
@@ -52,7 +51,7 @@ public abstract class AbstractPathStorage extends AbstractStorage<Path> implemen
     @Override
     protected void doUpdate(Resume r, Path path) {
         try {
-            strategy.doWrite(r, new BufferedOutputStream(Files.newOutputStream(path)));
+            doWrite(r, new BufferedOutputStream(Files.newOutputStream(path)));
         } catch (IOException e) {
             throw new StorageException("Path write error", r.getUuid());
         }
@@ -79,7 +78,7 @@ public abstract class AbstractPathStorage extends AbstractStorage<Path> implemen
     @Override
     protected Resume doGet(Path path) {
         try {
-            return strategy.doRead(new BufferedInputStream(Files.newInputStream(path)));
+            return doRead(new BufferedInputStream(Files.newInputStream(path)));
         } catch (IOException e) {
             throw new StorageException("Path read error", path.getFileName().toString());
         }
