@@ -2,17 +2,18 @@ package ru.javawebinar.basejava.storage;
 
 import ru.javawebinar.basejava.exception.StorageException;
 import ru.javawebinar.basejava.model.Resume;
+import ru.javawebinar.basejava.storage.strategy.StreamStrategy;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class AbstractFileStorage extends AbstractStorage<File> {
+public class FileStorage extends AbstractStorage<File> {
     private final File directory;
     private final StreamStrategy strategy;
 
-    protected AbstractFileStorage(String dir, StreamStrategy strategy) {
+    protected FileStorage(String dir, StreamStrategy strategy) {
         Objects.requireNonNull(dir, "directory must not be null");
         directory = new File(dir);
         this.strategy = strategy;
@@ -26,23 +27,14 @@ public class AbstractFileStorage extends AbstractStorage<File> {
 
     @Override
     public void clear() {
-        File[] list = directory.listFiles();
-        if (list != null) {
-            for (File name : list) {
-                doDelete(name);
-            }
-        } else {
-            throw new StorageException("Filesystem error", directory.getName());
+        for (File name : getList()) {
+            doDelete(name);
         }
     }
 
     @Override
     public int size() {
-        String[] list = directory.list();
-        if (list == null) {
-            throw new StorageException("Filesystem error", directory.getName());
-        }
-        return list.length;
+        return getList().length;
     }
 
     @Override
@@ -67,23 +59,20 @@ public class AbstractFileStorage extends AbstractStorage<File> {
     @Override
     protected void doSave(Resume r, File file) {
         try {
-            if (file.createNewFile()) {
-                strategy.doWrite(r, new BufferedOutputStream(new FileOutputStream(file)));
-            }
+            file.createNewFile();
         } catch (IOException e) {
             throw new StorageException("IO error", file.getName(), e);
         }
+        doUpdate(r, file);
     }
 
     @Override
     protected Resume doGet(File file) {
-        Resume r;
         try {
-            r = strategy.doRead(new BufferedInputStream(new FileInputStream(file)));
+            return strategy.doRead(new BufferedInputStream(new FileInputStream(file)));
         } catch (IOException e) {
             throw new StorageException("IO error", file.getName(), e);
         }
-        return r;
     }
 
     @Override
@@ -96,15 +85,18 @@ public class AbstractFileStorage extends AbstractStorage<File> {
     @Override
     protected List<Resume> doCopyAll() {
         List<Resume> resumes = new ArrayList<>();
-        File[] list = directory.listFiles();
-        if (list != null) {
-            for (File name : list) {
-                resumes.add(doGet(name));
-            }
-        } else {
-            throw new StorageException("Filesystem error", directory.getName());
+        for (File name : getList()) {
+            resumes.add(doGet(name));
         }
         return resumes;
+    }
+
+    private File[] getList() {
+        File[] list = directory.listFiles();
+        if (list == null) {
+            throw new StorageException("Filesystem error", directory.getName());
+        }
+        return list;
     }
 }
 
