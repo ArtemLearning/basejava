@@ -1,27 +1,24 @@
 package ru.javawebinar.basejava.storage;
 
+import org.junit.Assert;
 import org.junit.Test;
+import ru.javawebinar.basejava.exception.StorageException;
 import ru.javawebinar.basejava.model.Resume;
 
-import static org.junit.Assert.fail;
-
-public abstract class AbstractArrayStorageTest extends AbstractStorageTest{
-
-    public AbstractArrayStorageTest(Storage storage) {
+public abstract class AbstractArrayStorageTest extends AbstractStorageTest {
+    protected AbstractArrayStorageTest(Storage storage) {
         super(storage);
     }
 
-    @Test(expected = RuntimeException.class )
-    public void saveOverflow() {
-        storage.clear();
+    @Test(expected = StorageException.class)
+    public void saveOverflow() throws Exception {
         try {
-            for (int i = 0; i < AbstractArrayStorage.STORAGE_LIMIT; i++) {
-                String fullName = "Name" + i;
-                storage.save(new Resume(fullName));
+            for (int i = 4; i <= AbstractArrayStorage.STORAGE_LIMIT; i++) {
+                storage.save(new Resume("Name" + i));
             }
-        } catch (RuntimeException e) {
-            fail("Раннее переполнение");
+        } catch (StorageException e) {
+            Assert.fail();
         }
-        storage.save(new Resume(UUID_NOT_EXIST));
+        storage.save(new Resume("Overflow"));
     }
 }
