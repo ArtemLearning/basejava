@@ -21,3 +21,17 @@ README.md
 /uuid2
 /storage/uuid3
 /uuid3
+/lib/gson-2.7.jar
+/lib/istack-commons-runtime-2.24.jar
+/lib/javax.activation-api-1.2.0.jar
+/lib/javax.annotation.jar
+/lib/javax.ejb.jar
+/lib/javax.jms.jar
+/lib/javax.persistence.jar
+/lib/javax.resource.jar
+/lib/javax.servlet.jar
+/lib/javax.servlet.jsp.jar
+/lib/javax.servlet.jsp.jstl.jar
+/lib/javax.transaction.jar
+/lib/jaxb-api-2.3.1.jar
+/lib/jaxb-impl-2.3.1.jar
