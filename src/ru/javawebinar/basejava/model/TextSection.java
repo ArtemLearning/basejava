@@ -14,10 +14,6 @@ public class TextSection extends Section {
         this.content = content;
     }
 
-    public String getContent() {
-        return content;
-    }
-
     @Override
     public String toString() {
         return content;
@@ -27,15 +23,12 @@ public class TextSection extends Section {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         TextSection that = (TextSection) o;
-
-        return content.equals(that.content);
-
+        return Objects.equals(content, that.content);
     }
 
     @Override
     public int hashCode() {
-        return content.hashCode();
+        return Objects.hash(content);
     }
 }

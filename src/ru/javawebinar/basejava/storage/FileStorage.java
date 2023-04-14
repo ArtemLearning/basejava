@@ -106,6 +106,19 @@ public class FileStorage extends AbstractStorage<File> {
         }
         return list;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FileStorage that = (FileStorage) o;
+        return Objects.equals(directory, that.directory) && Objects.equals(streamSerializer, that.streamSerializer);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(directory, streamSerializer);
+    }
 }
 
 

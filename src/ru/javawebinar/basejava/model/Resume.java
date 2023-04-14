@@ -23,8 +23,8 @@ public class Resume implements Comparable<Resume>, Serializable {
 
     private String fullName;
 
-    private Map<ContactType, String> contacts = new EnumMap<>(ContactType.class);
-    private Map<SectionType, Section> sections = new EnumMap<>(SectionType.class);
+    private final Map<ContactType, String> contacts = new EnumMap<>(ContactType.class);
+    private final Map<SectionType, Section> sections = new EnumMap<>(SectionType.class);
 
     public Resume() {
     }
@@ -77,10 +77,10 @@ public class Resume implements Comparable<Resume>, Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Resume resume = (Resume) o;
-        return Objects.equals(uuid, resume.uuid) &&
-                Objects.equals(fullName, resume.fullName) &&
-                Objects.equals(contacts, resume.contacts) &&
-                Objects.equals(sections, resume.sections);
+        return Objects.equals(uuid, resume.uuid)
+                && Objects.equals(fullName, resume.fullName)
+                && Objects.equals(contacts, resume.contacts)
+                && Objects.equals(sections, resume.sections);
     }
 
     @Override

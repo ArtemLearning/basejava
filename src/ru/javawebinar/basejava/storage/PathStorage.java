@@ -101,4 +101,17 @@ public class PathStorage extends AbstractStorage<Path> {
             throw new StorageException("Cannot get file list in ", getFileName(directory), e);
         }
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PathStorage that = (PathStorage) o;
+        return Objects.equals(directory, that.directory) && Objects.equals(streamSerializer, that.streamSerializer);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(directory, streamSerializer);
+    }
 }
