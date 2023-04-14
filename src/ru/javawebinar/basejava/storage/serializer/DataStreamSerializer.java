@@ -28,17 +28,10 @@ public class DataStreamSerializer implements StreamSerializer {
             for (Map.Entry<SectionType, Section> entry : sections.entrySet()) {
                 dos.writeUTF(entry.getKey().name());
                 switch (entry.getKey()) {
-                    case PERSONAL, OBJECTIVE -> {
-                        dos.writeUTF(serializeTextSection((TextSection) entry.getValue()));
-                    }
-                    case ACHIEVEMENT, QUALIFICATIONS -> {
-                        dos.writeUTF(serializeListSection((ListSection) entry.getValue()));
-                    }
-                    case EXPERIENCE, EDUCATION -> {
-                        dos.writeUTF(serializeOrganizationSection((OrganizationSection) entry.getValue()));
-                    }
+                    case PERSONAL, OBJECTIVE -> dos.writeUTF(serializeTextSection((TextSection) entry.getValue()));
+                    case ACHIEVEMENT, QUALIFICATIONS -> dos.writeUTF(serializeListSection((ListSection) entry.getValue()));
+                    case EXPERIENCE, EDUCATION -> dos.writeUTF(serializeOrganizationSection((OrganizationSection) entry.getValue()));
                 }
-//                dos.writeUTF(entry.getValue().toString());
             }
         }
     }
@@ -71,16 +64,6 @@ public class DataStreamSerializer implements StreamSerializer {
                         resume.addSection(sectionType, os);
                     }
                 }
-//                if (sectionType.equals(SectionType.PERSONAL) || sectionType.equals(SectionType.OBJECTIVE)) {
-//                    TextSection ts = deserializeTextSection(dis.readUTF());
-//                    resume.addSection(sectionType, ts);
-//                } else if (sectionType.equals(SectionType.ACHIEVEMENT) || sectionType.equals(SectionType.QUALIFICATIONS)) {
-//                    ListSection ls = new ListSection(dis.readUTF());
-//                    resume.addSection(sectionType, ls);
-//                } else if (sectionType.equals(SectionType.EXPERIENCE) || sectionType.equals(SectionType.EDUCATION)) {
-////                    OrganizationSection os = new OrganizationSection(dis.readUTF());
-//                    resume.addSection(sectionType, null);
-//                }
             }
             return resume;
 
