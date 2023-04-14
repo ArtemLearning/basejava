@@ -112,7 +112,7 @@ public class DataStreamSerializer implements StreamSerializer {
         String str = null;
         for (Organization org : os.getOrganizations()) {
             str = org.getName() + "$" + org.getUrl() + "@";
-            for (Organization.Position ops : org.getPositionList()) {
+            for (Organization.Position ops : org.getPositions()) {
                 str = str + ops.getStartDate() + '$' + ops.getEndDate() + "$" + ops.getTitle() + "$" + ops.getDescription() + "$";
             }
             str += "#";
