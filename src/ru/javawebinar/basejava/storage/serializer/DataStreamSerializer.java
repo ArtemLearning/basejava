@@ -29,8 +29,10 @@ public class DataStreamSerializer implements StreamSerializer {
                 dos.writeUTF(entry.getKey().name());
                 switch (entry.getKey()) {
                     case PERSONAL, OBJECTIVE -> dos.writeUTF(serializeTextSection((TextSection) entry.getValue()));
-                    case ACHIEVEMENT, QUALIFICATIONS -> dos.writeUTF(serializeListSection((ListSection) entry.getValue()));
-                    case EXPERIENCE, EDUCATION -> dos.writeUTF(serializeOrganizationSection((OrganizationSection) entry.getValue()));
+                    case ACHIEVEMENT, QUALIFICATIONS ->
+                            dos.writeUTF(serializeListSection((ListSection) entry.getValue()));
+                    case EXPERIENCE, EDUCATION ->
+                            dos.writeUTF(serializeOrganizationSection((OrganizationSection) entry.getValue()));
                 }
             }
         }
@@ -81,24 +83,24 @@ public class DataStreamSerializer implements StreamSerializer {
     private String serializeListSection(ListSection ls) {
         String str = null;
         for (String s : ls.getItems()) {
-            str = (str == null) ? s : str.concat(";").concat(s);
+            str = (str == null) ? s : str.concat("#").concat(s);
         }
         return str;
     }
 
     private ListSection deserializeListSection(String s) {
-        String[] strings = s.split(";");
+        String[] strings = s.split("#");
         return new ListSection(Arrays.asList(strings));
     }
 
     private String serializeOrganizationSection(OrganizationSection os) {
         String str = null;
         for (Organization org : os.getOrganizations()) {
-            str = org.getName() + "$" + org.getUrl() + "@";
+            str = org.getName() + "#" + org.getUrl() + "@";
             for (Organization.Position ops : org.getPositions()) {
-                str = str + ops.getStartDate() + '$' + ops.getEndDate() + "$" + ops.getTitle() + "$" + ops.getDescription() + "$";
+                str = str + ops.getStartDateString() + '$' + ops.getEndDateString() + "$" + ops.getTitle() + "$" + ops.getDescription() + "&";
             }
-            str += "#";
+            str += "*";
         }
         return str;
     }
@@ -109,37 +111,38 @@ public class DataStreamSerializer implements StreamSerializer {
         String name = null;
         String url = null;
         String positions = null;
-        String[] organizations = s.split("#");
+        String[] organizations = s.split("\\*");
         for (int i = 0; i < organizations.length; i++) {
-            String[] header = organizations[i].split("@");
+            String[] all = organizations[i].split("@");
+            String[] header = all[0].split("#");
             if (header.length == 1) {
                 name = header[0];
             } else if (header.length == 2) {
                 name = header[0];
-                positions = header[1];
-            } else if (header.length == 3) {
-                name = header[0];
                 url = header[1];
-                positions = header[2];
             }
-            if (positions != null) {
-                String[] strings = positions.split("\\$");
-                for (int j = 0; j < strings.length; ) {
-                    LocalDate startDate = LocalDate.parse(strings[j]);
-                    LocalDate endDate = LocalDate.parse(strings[j + 1]);
-                    String title = strings[j + 2];
-                    String description;
-                    try {
-                        description = strings[j + 3];
-                        j += 4;
-                    } catch (ArrayIndexOutOfBoundsException e) {
-                        description = null;
-                        j += 3;
-                    }
-                    if (lp != null) {
-                        lp.add(new Organization.Position(startDate, endDate, title, description));
+            try {
+                positions = all[1];
+                if (positions != null) {
+                    String[] strings = positions.split("&");
+                    for (String string : strings) {
+                        String[] position = string.split("\\$");
+                        LocalDate startDate = LocalDate.parse(position[0]);
+                        LocalDate endDate = LocalDate.parse(position[1]);
+                        String title = position[2];
+                        String description;
+                        try {
+                            description = position[3];
+                        } catch (ArrayIndexOutOfBoundsException e) {
+                            description = null;
+                        }
+                        if (lp != null) {
+                            lp.add(new Organization.Position(startDate, endDate, title, description));
+                        }
                     }
                 }
+            } catch (IndexOutOfBoundsException e) {
+                lp = null;
             }
             org.add(new Organization(name, url, lp));
         }

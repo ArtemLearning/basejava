@@ -77,7 +77,7 @@ public class Organization implements Serializable {
 
     @Override
     public String toString() {
-        return "Organization(" + homePage + "," + positions + ')';
+        return "Organization(" + homePage + "," + positions + ")";
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)
@@ -115,10 +115,16 @@ public class Organization implements Serializable {
             return startDate;
         }
 
+        public String getStartDateString() {
+            return startDate.toString();
+        }
         public LocalDate getEndDate() {
             return endDate;
         }
 
+        public String getEndDateString() {
+            return endDate.toString();
+        }
         public String getTitle() {
             return title;
         }
