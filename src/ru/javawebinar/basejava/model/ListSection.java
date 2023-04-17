@@ -24,6 +24,10 @@ public class ListSection extends Section {
         return items;
     }
 
+    public void add(String section) {
+        items.add(section);
+    }
+
     @Override
     public String toString() {
         return items.toString();

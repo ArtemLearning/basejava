@@ -5,7 +5,6 @@ import ru.javawebinar.basejava.model.*;
 import java.io.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -29,10 +28,9 @@ public class DataStreamSerializer implements StreamSerializer {
                 dos.writeUTF(entry.getKey().name());
                 switch (entry.getKey()) {
                     case PERSONAL, OBJECTIVE -> dos.writeUTF(serializeTextSection((TextSection) entry.getValue()));
-                    case ACHIEVEMENT, QUALIFICATIONS ->
-                            dos.writeUTF(serializeListSection((ListSection) entry.getValue()));
+                    case ACHIEVEMENT, QUALIFICATIONS -> serializeListSection(dos, (ListSection) entry.getValue());
                     case EXPERIENCE, EDUCATION ->
-                            dos.writeUTF(serializeOrganizationSection((OrganizationSection) entry.getValue()));
+                            serializeOrganizationSection(dos, (OrganizationSection) entry.getValue());
                 }
             }
         }
@@ -58,11 +56,11 @@ public class DataStreamSerializer implements StreamSerializer {
                         resume.addSection(sectionType, ts);
                     }
                     case ACHIEVEMENT, QUALIFICATIONS -> {
-                        ListSection ls = deserializeListSection(dis.readUTF());
+                        ListSection ls = deserializeListSection(dis);
                         resume.addSection(sectionType, ls);
                     }
                     case EXPERIENCE, EDUCATION -> {
-                        OrganizationSection os = deserializeOrganizationSection(dis.readUTF());
+                        OrganizationSection os = deserializeOrganizationSection(dis);
                         resume.addSection(sectionType, os);
                     }
                 }
@@ -80,71 +78,68 @@ public class DataStreamSerializer implements StreamSerializer {
         return new TextSection(s);
     }
 
-    private String serializeListSection(ListSection ls) {
-        String str = null;
+    private void serializeListSection(DataOutputStream dos, ListSection ls) throws IOException {
+        dos.writeInt(ls.getItems().size());
         for (String s : ls.getItems()) {
-            str = (str == null) ? s : str.concat("#").concat(s);
+            dos.writeUTF(s);
         }
-        return str;
     }
 
-    private ListSection deserializeListSection(String s) {
-        String[] strings = s.split("#");
-        return new ListSection(Arrays.asList(strings));
+    private ListSection deserializeListSection(DataInputStream dis) throws IOException {
+        List<String> ls = new ArrayList<>();
+        int size = dis.readInt();
+        for (int i = 0; i < size; i++) {
+            ls.add(dis.readUTF());
+        }
+        return new ListSection(ls);
     }
 
-    private String serializeOrganizationSection(OrganizationSection os) {
-        String str = null;
+    private void serializeOrganizationSection(DataOutputStream dos, OrganizationSection os) throws IOException {
+        dos.writeInt(os.getOrganizations().size());
         for (Organization org : os.getOrganizations()) {
-            str = org.getName() + "#" + org.getUrl() + "@";
-            for (Organization.Position ops : org.getPositions()) {
-                str = str + ops.getStartDateString() + '$' + ops.getEndDateString() + "$" + ops.getTitle() + "$" + ops.getDescription() + "&";
+            dos.writeUTF(org.getName());
+            if (org.getUrl() == null) {
+                dos.writeUTF("");
+            } else {
+                dos.writeUTF(org.getUrl());
             }
-            str += "*";
+            dos.writeInt(org.getPositions().size());
+            for (Organization.Position ops : org.getPositions()) {
+                dos.writeUTF(ops.getStartDateString());
+                dos.writeUTF(ops.getEndDateString());
+                dos.writeUTF(ops.getTitle());
+                if (ops.getDescription() == null) {
+                    dos.writeUTF("");
+                } else {
+                    dos.writeUTF(ops.getDescription());
+                }
+            }
         }
-        return str;
     }
 
-    private OrganizationSection deserializeOrganizationSection(String s) {
+    private OrganizationSection deserializeOrganizationSection(DataInputStream dis) throws IOException {
         List<Organization> org = new ArrayList<>();
         List<Organization.Position> lp = new ArrayList<>();
-        String name = null;
-        String url = null;
-        String positions = null;
-        String[] organizations = s.split("\\*");
-        for (int i = 0; i < organizations.length; i++) {
-            String[] all = organizations[i].split("@");
-            String[] header = all[0].split("#");
-            if (header.length == 1) {
-                name = header[0];
-            } else if (header.length == 2) {
-                name = header[0];
-                url = header[1];
+        int size = dis.readInt();
+        for (int i = 0; i < size; i++) {
+            String name = dis.readUTF();
+            String url = dis.readUTF();
+            if (url.equals("")) {
+                url = null;
             }
-            try {
-                positions = all[1];
-                if (positions != null) {
-                    String[] strings = positions.split("&");
-                    for (String string : strings) {
-                        String[] position = string.split("\\$");
-                        LocalDate startDate = LocalDate.parse(position[0]);
-                        LocalDate endDate = LocalDate.parse(position[1]);
-                        String title = position[2];
-                        String description;
-                        try {
-                            description = position[3];
-                        } catch (ArrayIndexOutOfBoundsException e) {
-                            description = null;
-                        }
-                        if (lp != null) {
-                            lp.add(new Organization.Position(startDate, endDate, title, description));
-                        }
-                    }
+            int positionsSize = dis.readInt();
+            for (int j = 0; j < positionsSize; j++) {
+                LocalDate startDate = LocalDate.parse(dis.readUTF());
+                LocalDate endDate = LocalDate.parse(dis.readUTF());
+                String title = dis.readUTF();
+                String description = dis.readUTF();
+                if (description.equals("")) {
+                    description = null;
                 }
-            } catch (IndexOutOfBoundsException e) {
-                lp = null;
+                lp.add(new Organization.Position(startDate, endDate, title, description));
             }
             org.add(new Organization(name, url, lp));
+            lp = new ArrayList<>();
         }
         return new OrganizationSection(org);
     }
