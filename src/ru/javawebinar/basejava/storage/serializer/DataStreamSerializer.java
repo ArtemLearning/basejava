@@ -26,6 +26,8 @@ public class DataStreamSerializer implements StreamSerializer {
             dos.writeInt(sections.size());
             for (Map.Entry<SectionType, Section> entry : sections.entrySet()) {
                 dos.writeUTF(entry.getKey().name());
+
+
 //                switch (entry.getKey()) {
 //                    case PERSONAL, OBJECTIVE -> dos.writeUTF(serializeTextSection((TextSection) entry.getValue()));
 //                    case ACHIEVEMENT, QUALIFICATIONS -> serializeListSection(dos, (ListSection) entry.getValue());
