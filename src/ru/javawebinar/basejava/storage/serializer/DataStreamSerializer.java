@@ -6,6 +6,7 @@ import ru.javawebinar.basejava.model.Section;
 import ru.javawebinar.basejava.model.SectionType;
 
 import java.io.*;
+import java.util.Collection;
 import java.util.Map;
 
 public class DataStreamSerializer implements StreamSerializer {
@@ -18,9 +19,12 @@ public class DataStreamSerializer implements StreamSerializer {
             Map<ContactType, String> contacts = r.getAllContacts();
             dos.writeInt(contacts.size());
             for (Map.Entry<ContactType, String> entry : contacts.entrySet()) {
+                doWriteWithException(contacts, dos);
                 dos.writeUTF(entry.getKey().name());
                 dos.writeUTF(entry.getValue());
             }
+
+
             Map<SectionType, Section> sections = r.getAllSections();
             // TODO: Implement sections
             dos.writeInt(sections.size());
@@ -70,6 +74,32 @@ public class DataStreamSerializer implements StreamSerializer {
             return resume;
 
         }
+    }
+
+    public interface ActionWrite<T> {
+        void write(T t) throws IOException;
+    }
+
+    public interface ActionRead<T> {
+        T read() throws IOException;
+    }
+
+    private void doWriteWithException(Collection<Object> collection, DataOutputStream dos) throws IOException {
+        ActionWrite action = t -> dos.writeUTF(t.toString());
+        while (collection.iterator().hasNext()) {
+            action.write(collection.iterator().next());
+        }
+    }
+
+    private void doReadWithException(Collection<Object> collection, DataInputStream dis) throws IOException {
+        ActionRead action = () -> readInputStream(dis);
+        while (collection.iterator().hasNext()) {
+            collection.add((Object) action.read());
+        }
+    }
+
+    public Object readInputStream(DataInputStream dis) throws IOException {
+        return null;
     }
 
     /* private String serializeTextSection(TextSection ts) {
