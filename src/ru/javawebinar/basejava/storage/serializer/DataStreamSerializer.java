@@ -20,35 +20,29 @@ public class DataStreamSerializer implements StreamSerializer {
                 dos.writeUTF(entry.getValue());
             });
             // TODO: Implement sections
-            writeCollection(dos,
-                    r.getAllSections().entrySet(),
-                    entry -> {
-                        SectionType sectionType = entry.getKey();
-                        Section section = entry.getValue();
-                        dos.writeUTF(sectionType.name());
-                        switch (sectionType) {
-                            case PERSONAL, OBJECTIVE -> dos.writeUTF(((TextSection) section).toString());
-                            case ACHIEVEMENT, QUALIFICATIONS ->
-                                    writeCollection(dos, ((ListSection) section).getItems(), dos::writeUTF);
-                            case EXPERIENCE, EDUCATION ->
-                                    writeCollection(dos, ((OrganizationSection) section).getOrganizations(), organization -> {
-                                        dos.writeUTF(organization.getName());
-                                        dos.writeUTF(organization.getUrl());
-                                        writeCollection(dos, organization.getPositions(), position -> {
-                                            dos.writeUTF(getLocalDate(position.getStartDate()));
-                                            dos.writeUTF(getLocalDate(position.getEndDate()));
-                                            dos.writeUTF(position.getTitle());
-                                            dos.writeUTF(position.getDescription());
-                                        });
-                                    });
-                            default -> throw new IllegalStateException("Unexpected value: " + sectionType.name());
-                        }
-                    });
+            writeCollection(dos, r.getAllSections().entrySet(), entry -> {
+                SectionType sectionType = entry.getKey();
+                Section section = entry.getValue();
+                dos.writeUTF(sectionType.name());
+                switch (sectionType) {
+                    case PERSONAL, OBJECTIVE -> dos.writeUTF(((TextSection) section).getContent());
+                    case ACHIEVEMENT, QUALIFICATIONS ->
+                            writeCollection(dos, ((ListSection) section).getItems(), dos::writeUTF);
+                    case EXPERIENCE, EDUCATION ->
+                            writeCollection(dos, ((OrganizationSection) section).getOrganizations(), organization -> {
+                                dos.writeUTF(organization.getName());
+                                dos.writeUTF(organization.getUrl());
+                                writeCollection(dos, organization.getPositions(), position -> {
+                                    writeLocalDate(dos, (position.getStartDate()));
+                                    writeLocalDate(dos, (position.getEndDate()));
+                                    dos.writeUTF(position.getTitle());
+                                    dos.writeUTF(position.getDescription());
+                                });
+                            });
+                    default -> throw new IllegalStateException("Unexpected value: " + sectionType.name());
+                }
+            });
         }
-    }
-
-    private String getLocalDate(LocalDate date) {
-        return date.getYear() + date.getMonth().name();
     }
 
     @Override
@@ -57,9 +51,7 @@ public class DataStreamSerializer implements StreamSerializer {
             String uuid = dis.readUTF();
             String fullName = dis.readUTF();
             Resume resume = new Resume(uuid, fullName);
-            readCollection(dis, () -> {
-                resume.addContact(ContactType.valueOf(dis.readUTF()), dis.readUTF());
-            });
+            readCollection(dis, () -> resume.addContact(ContactType.valueOf(dis.readUTF()), dis.readUTF()));
             // TODO: Implement sections
             readCollection(dis, () -> {
                 SectionType sectionType = SectionType.valueOf(dis.readUTF());
@@ -67,6 +59,20 @@ public class DataStreamSerializer implements StreamSerializer {
             });
             return resume;
         }
+    }
+
+    public interface ActionWrite<T> {
+        void write(T t) throws IOException;
+    }
+
+    public interface ActionRead<T> {
+        T read() throws IOException;
+
+    }
+
+    public interface Action<T> {
+        void operate() throws IOException;
+
     }
 
     private Section readSingleSection(DataInputStream dis, SectionType sectionType) throws IOException {
@@ -84,19 +90,9 @@ public class DataStreamSerializer implements StreamSerializer {
         }
     }
 
-
-    public interface ActionWrite<T> {
-        void write(T t) throws IOException;
-    }
-
-    public interface ActionRead<T> {
-        T read() throws IOException;
-
-    }
-
-    public interface Action<T> {
-        void operate() throws IOException;
-
+    private void writeLocalDate(DataOutputStream dos, LocalDate date) throws IOException {
+        dos.writeInt(date.getYear());
+        dos.writeInt(date.getMonthValue());
     }
 
     private <T> void writeCollection(DataOutputStream dos, Collection<T> collection, ActionWrite<T> element) throws IOException {

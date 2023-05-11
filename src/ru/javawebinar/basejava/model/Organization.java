@@ -108,23 +108,17 @@ public class Organization implements Serializable {
             this.startDate = startDate;
             this.endDate = endDate;
             this.title = title;
-            this.description = description;
+            this.description = description == null ? "" : description;
         }
 
         public LocalDate getStartDate() {
             return startDate;
         }
 
-        public String getStartDateString() {
-            return startDate.toString();
-        }
         public LocalDate getEndDate() {
             return endDate;
         }
 
-        public String getEndDateString() {
-            return endDate.toString();
-        }
         public String getTitle() {
             return title;
         }
