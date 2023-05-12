@@ -4,7 +4,9 @@ import ru.javawebinar.basejava.model.*;
 
 import java.io.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 public class DataStreamSerializer implements StreamSerializer {
@@ -81,10 +83,15 @@ public class DataStreamSerializer implements StreamSerializer {
                 return new TextSection(dis.readUTF());
             }
             case ACHIEVEMENT, QUALIFICATIONS -> {
-                return new ListSection();
+                return new ListSection(readListCollection(dis, dis::readUTF));
             }
             case EXPERIENCE, EDUCATION -> {
-                return new OrganizationSection();
+                return new OrganizationSection(readListCollection(dis, () ->
+                        new Organization(new Link(dis.readUTF(), dis.readUTF()),
+                                readListCollection(dis, () ->
+                                        new Organization.Position(
+                                                readLocalDate(dis), readLocalDate(dis),
+                                                dis.readUTF(), dis.readUTF())))));
             }
             default -> throw new IllegalStateException("Unexpected value: " + sectionType.name());
         }
@@ -93,6 +100,10 @@ public class DataStreamSerializer implements StreamSerializer {
     private void writeLocalDate(DataOutputStream dos, LocalDate date) throws IOException {
         dos.writeInt(date.getYear());
         dos.writeInt(date.getMonthValue());
+    }
+
+    private LocalDate readLocalDate(DataInputStream dis) throws IOException {
+        return LocalDate.of(dis.readInt(), dis.readInt(), 1);
     }
 
     private <T> void writeCollection(DataOutputStream dos, Collection<T> collection, ActionWrite<T> element) throws IOException {
@@ -107,5 +118,14 @@ public class DataStreamSerializer implements StreamSerializer {
         for (int i = 0; i < records; i++) {
             element.operate();
         }
+    }
+
+    private <T> List<T> readListCollection(DataInputStream dis, ActionRead<T> element) throws IOException {
+        final List<T> list = new ArrayList<>();
+        int records = dis.readInt();
+        for (int i = 0; i < records; i++) {
+            list.add(element.read());
+        }
+        return list;
     }
 }
