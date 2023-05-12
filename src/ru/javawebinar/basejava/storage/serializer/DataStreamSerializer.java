@@ -63,15 +63,18 @@ public class DataStreamSerializer implements StreamSerializer {
         }
     }
 
+    @FunctionalInterface
     public interface ActionWrite<T> {
         void write(T t) throws IOException;
     }
 
+    @FunctionalInterface
     public interface ActionRead<T> {
         T read() throws IOException;
 
     }
 
+    @FunctionalInterface
     public interface Action<T> {
         void operate() throws IOException;
 
