@@ -18,8 +18,8 @@ public class MainStream {
 
     private static int minValue(int[] values) {
         return Arrays.stream(values)
-                .distinct()              // Get distinct numbers
-                .sorted()                // Sort distinct number ascended
+                .distinct()
+                .sorted()
                 .reduce((a, b) -> a * 10 + b)
                 .orElseThrow();
     }
