@@ -5,6 +5,7 @@ import org.junit.Test;
 import ru.javawebinar.basejava.exception.ExistStorageException;
 import ru.javawebinar.basejava.exception.NotExistStorageException;
 import ru.javawebinar.basejava.model.*;
+import ru.javawebinar.basejava.util.Config;
 
 import java.time.Month;
 import java.util.Arrays;
@@ -14,7 +15,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public abstract class AbstractStorageTest {
-    protected static final String STORAGE_DIR = "C:\\Users\\apogosov\\IdeaProjects\\basejava\\storage";
+    protected static final String STORAGE_DIR = Config.get().getStorageDir().toString();
 
     protected Storage storage;
 
