@@ -1,6 +1,5 @@
 package ru.javawebinar.basejava.storage;
 
-import ru.javawebinar.basejava.exception.ExistStorageException;
 import ru.javawebinar.basejava.exception.NotExistStorageException;
 import ru.javawebinar.basejava.model.Resume;
 import ru.javawebinar.basejava.util.SqlHelper;
@@ -21,66 +20,63 @@ public class SqlStorage implements Storage {
     @Override
     public void clear() {
         String str = "DELETE FROM resume";
-        helper.runRequest(str, null, null, PreparedStatement::execute);
+        helper.runRequest(str, PreparedStatement::execute);
     }
 
     @Override
     public void update(Resume r) {
         String str = "UPDATE resume SET full_name = ? WHERE uuid = ?";
-        helper.runRequest(str, r.getFullName(), r.getUuid(), PreparedStatement::execute);
+        helper.runRequest(str, (ps) -> {
+            ps.setString(1, r.getFullName());
+            ps.setString(2, r.getUuid());
+            return ps.executeUpdate();
+        });
     }
 
     @Override
     public void save(Resume r) {
-        String str = "SELECT r.uuid FROM resume r WHERE uuid = ?";
-        helper.runRequest(str, r.getUuid(), null,
-                (ps) -> {
-                    ResultSet rs = ps.executeQuery();
-                    if (rs.next()) {
-                        throw new ExistStorageException(r.getUuid());
-                    }
-                    return null;
-                });
-        str = "INSERT INTO resume(uuid, full_name) VALUES (?,?)";
-        helper.runRequest(str, r.getUuid(), r.getFullName(), PreparedStatement::execute);
+        String str = "INSERT INTO resume(uuid, full_name) VALUES (?,?)";
+        helper.runRequest(str, (ps) -> {
+            ps.setString(1, r.getUuid());
+            ps.setString(2, r.getFullName());
+            ps.execute();
+            return null;
+        });
     }
 
     @Override
     public Resume get(String uuid) {
         String str = "SELECT * FROM resume r WHERE r.uuid = ?";
-        return helper.runRequest(str, uuid, null,
-                (ps) -> {
-                    ResultSet rs = ps.executeQuery();
-                    if (rs.next()) {
-                        return new Resume(uuid, rs.getString("full_name"));
-                    } else {
-                        throw new NotExistStorageException(uuid);
-                    }
-                });
-    }
-
-    @Override
-    public void delete(String uuid) {
-        String str = "SELECT r.uuid FROM resume r WHERE r.uuid = ?";
-        helper.runRequest(str, uuid, null, (ps) -> {
+        return helper.runRequest(str, (ps) -> {
+            ps.setString(1, uuid);
             ResultSet rs = ps.executeQuery();
             if (!rs.next()) {
                 throw new NotExistStorageException(uuid);
             }
+            return new Resume(uuid, rs.getString("full_name"));
+        });
+    }
+
+    @Override
+    public void delete(String uuid) {
+        String str = "DELETE FROM resume r WHERE r.uuid = ?";
+        helper.runRequest(str, (ps) -> {
+            ps.setString(1, uuid);
+            if (ps.executeUpdate() == 0) {
+                throw new NotExistStorageException(uuid);
+            }
             return null;
         });
-        str = "DELETE FROM resume r WHERE r.uuid = ?";
-        helper.runRequest(str, uuid, null, PreparedStatement::execute);
     }
 
     @Override
     public List<Resume> getAllSorted() {
-        String str = "SELECT * FROM resume ORDER BY uuid, full_name";
-        return helper.runRequest(str, null, null, (ps) -> {
+        String str = "SELECT * FROM resume ORDER BY full_name, uuid";
+        return helper.runRequest(str, (ps) -> {
             ResultSet rs = ps.executeQuery();
             List<Resume> lr = new ArrayList<>();
             while (rs.next()) {
-                Resume r = new Resume(rs.getString("uuid").trim(), rs.getString("full_name").trim());
+                Resume r = new Resume(rs.getString("uuid"), rs.getString("full_name"));
                 lr.add(r);
             }
             return lr;
@@ -90,13 +86,9 @@ public class SqlStorage implements Storage {
     @Override
     public int size() {
         String str = "SELECT COUNT(*) FROM resume";
-        return helper.runRequest(str, null, null, (ps) -> {
+        return helper.runRequest(str, (ps) -> {
             ResultSet rs = ps.executeQuery();
-            int num = 0;
-            while (rs.next()) {
-                num = (rs.getInt(1));
-            }
-            return num;
+            return rs.next() ? rs.getInt(1) : 0;
         });
     }
 }

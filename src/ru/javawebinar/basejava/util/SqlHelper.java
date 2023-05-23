@@ -1,5 +1,6 @@
 package ru.javawebinar.basejava.util;
 
+import ru.javawebinar.basejava.exception.ExistStorageException;
 import ru.javawebinar.basejava.exception.StorageException;
 import ru.javawebinar.basejava.sql.ConnectionFactory;
 
@@ -9,7 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class SqlHelper {
-    public final Connection connection;
+    private final ConnectionFactory connectionFactory;
 
     @FunctionalInterface
     public interface Request<T> {
@@ -17,21 +18,17 @@ public class SqlHelper {
     }
 
     public SqlHelper(String dbUrl, String dbUser, String dbPassword) throws SQLException {
-        ConnectionFactory connectionFactory = () -> DriverManager.getConnection(dbUrl, dbUser, dbPassword);
-        connection = connectionFactory.getConnection();
+        connectionFactory = () -> DriverManager.getConnection(dbUrl, dbUser, dbPassword);
     }
 
-    public <T> T runRequest(String statement, String str1, String str2, Request<T> t) {
-        try {
-            PreparedStatement ps = connection.prepareStatement(statement);
-            if (str1 != null) {
-                ps.setString(1, str1);
-            }
-            if (str2 != null) {
-                ps.setString(2, str2);
-            }
+    public <T> T runRequest(String statement, Request<T> t) {
+        try (Connection connection = connectionFactory.getConnection();
+             PreparedStatement ps = connection.prepareStatement(statement)) {
             return t.execute(ps);
         } catch (SQLException e) {
+            if (e.getSQLState().equals("23505")) {  // Already exists
+                throw new ExistStorageException(null);
+            }
             throw new StorageException(e);
         }
     }
