@@ -2,10 +2,7 @@ package ru.javawebinar.basejava.sql;
 
 import ru.javawebinar.basejava.exception.StorageException;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class SqlHelper {
     private final ConnectionFactory connectionFactory;
@@ -16,7 +13,7 @@ public class SqlHelper {
 
     public <T> T runRequest(String statement, SqlExecutor<T> t) {
         try (Connection connection = connectionFactory.getConnection();
-             PreparedStatement ps = connection.prepareStatement(statement)) {
+             PreparedStatement ps = connection.prepareStatement(statement, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)) {
             return t.execute(ps);
         } catch (SQLException e) {
             throw ExceptionUtil.convertException(e);
