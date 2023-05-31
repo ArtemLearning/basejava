@@ -63,7 +63,7 @@ public class SqlStorage implements Storage {
         return sqlHelper.runTransaction(conn -> {
             try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM resume AS r WHERE r.uuid = ?")) {
                 ps.setString(1, uuid);
-                ResultSet rs = ps.executeQuery();
+                final ResultSet rs = ps.executeQuery();
                 if (!rs.next()) {
                     throw new NotExistStorageException(uuid);
                 }
@@ -106,7 +106,7 @@ public class SqlStorage implements Storage {
     @Override
     public int size() {
         return sqlHelper.runRequest("SELECT COUNT(*) FROM resume", (ps) -> {
-            ResultSet rs = ps.executeQuery();
+            final ResultSet rs = ps.executeQuery();
             return rs.next() ? rs.getInt(1) : 0;
         });
     }
@@ -124,9 +124,9 @@ public class SqlStorage implements Storage {
     }
 
     private Resume addContacts(Connection conn, Resume r) throws SQLException {
-        PreparedStatement ps = conn.prepareStatement("SELECT * FROM contact AS c WHERE c.resume_uuid = ?");
+        final PreparedStatement ps = conn.prepareStatement("SELECT * FROM contact AS c WHERE c.resume_uuid = ?");
         ps.setString(1, r.getUuid());
-        ResultSet rs = ps.executeQuery();
+        final ResultSet rs = ps.executeQuery();
         while (rs.next()) {
             r.addContact(ContactType.valueOf(rs.getString("type")), rs.getString("value"));
         }
