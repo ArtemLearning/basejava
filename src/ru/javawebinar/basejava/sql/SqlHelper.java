@@ -20,11 +20,12 @@ public class SqlHelper {
         }
     }
 
-    public <T> void runTransaction(SqlTransaction<T> t) {
+    public <T> T runTransaction(SqlTransaction<T> t) {
+        final T res;
         try (Connection conn = connectionFactory.getConnection()) {
             try {
                 conn.setAutoCommit(false);
-                T res = t.execute(conn);
+                res = t.execute(conn);
                 conn.commit();
             } catch (SQLException e) {
                 conn.rollback();
@@ -33,5 +34,6 @@ public class SqlHelper {
         } catch (SQLException e) {
             throw new StorageException(e);
         }
+        return res;
     }
 }
