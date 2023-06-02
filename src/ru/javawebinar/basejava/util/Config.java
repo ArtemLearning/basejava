@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 public class Config {
-    protected static final File PROPS = new File(".\\config\\resumes.properties");
+    protected static final File PROPS = new File("C:\\Users\\apogosov\\IdeaProjects\\basejava\\config\\resumes.properties"); //File(".\\config\\resumes.properties");
     private static final Config INSTANCE = new Config();
     private final Storage storage;
     private final File storageDir;
