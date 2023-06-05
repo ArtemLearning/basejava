@@ -13,14 +13,17 @@ import java.io.PrintWriter;
 import java.util.List;
 
 public class ResumeServlet extends HttpServlet {
+
+    SqlStorage storage;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        init();
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
         response.setContentType("text/html; charset =UTF-8");
 //        String name = request.getParameter("name");
 //        response.getWriter().write(name == null ? "Hello Resumes" : "Hello " + name);
-        final SqlStorage storage = (SqlStorage) Config.get().getStorage();
         final List<Resume> list = storage.getAllSorted();
         final PrintWriter out = response.getWriter();
         out.println("<head><title>Курс BaseJava</title></head>");
@@ -37,5 +40,9 @@ public class ResumeServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+    }
+
+    public void init() {
+        storage = (SqlStorage) Config.get().getStorage();
     }
 }

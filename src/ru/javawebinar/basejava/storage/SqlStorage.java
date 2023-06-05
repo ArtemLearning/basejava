@@ -130,31 +130,22 @@ public class SqlStorage implements Storage {
     }
 
     private void insertSections(Connection conn, Resume r) throws SQLException {
-        try (PreparedStatement ps = conn.prepareStatement("INSERT INTO section(resume_uuid, section_type, position,  content) VALUES (?,?,?,?)")) {
+        try (PreparedStatement ps = conn.prepareStatement("INSERT INTO section(resume_uuid, section_type, content) VALUES (?,?,?)")) {
             int index = 0;
             for (Map.Entry<SectionType, Section> e : r.getAllSections().entrySet()) {
+                ps.setString(1, r.getUuid());
+                ps.setString(2, e.getKey().toString());
                 switch (e.getKey()) {
                     case PERSONAL, OBJECTIVE -> {
                         TextSection ts = (TextSection) e.getValue();
-                        ps.setString(1, r.getUuid());
-                        ps.setString(2, e.getKey().toString());
-                        ps.setInt(3, 0);
-                        ps.setString(4, ts.getContent());
+                        ps.setString(3, ts.getContent());
                         ps.addBatch();
                     }
                     case ACHIEVEMENT, QUALIFICATIONS -> {
                         ListSection ls = (ListSection) e.getValue();
-                        ps.setString(1, r.getUuid());
-                        ps.setString(2, e.getKey().toString());
-                        index = 0;
-                        for (String str : ls.getItems()) {
-                            ps.setInt(3, index);
-                            ps.setString(4, str);
-                            ++index;
-                            ps.addBatch();
-                        }
+                        ps.setString(3, String.join("\n", ls.getItems()));
+                        ps.addBatch();
                     }
-
                     case EXPERIENCE, EDUCATION -> {  //TODO Add OrganizationSection
                     }
                 }
@@ -165,17 +156,18 @@ public class SqlStorage implements Storage {
 
 
     private Resume addContacts(Connection conn, Resume r) throws SQLException {
-        final PreparedStatement ps = conn.prepareStatement("SELECT * FROM contact AS c WHERE c.resume_uuid = ?");
-        ps.setString(1, r.getUuid());
-        final ResultSet rs = ps.executeQuery();
-        while (rs.next()) {
-            r.addContact(ContactType.valueOf(rs.getString("type")), rs.getString("value"));
+        try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM contact AS c WHERE c.resume_uuid = ?")) {
+            ps.setString(1, r.getUuid());
+            final ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                r.addContact(ContactType.valueOf(rs.getString("type")), rs.getString("value"));
+            }
+            return r;
         }
-        return r;
     }
 
     private Resume addSections(Connection conn, Resume r) throws SQLException {
-        try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM section AS s WHERE s.resume_uuid = ?", ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)) {
+        try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM section AS s WHERE s.resume_uuid = ?")) {
             ps.setString(1, r.getUuid());
             final ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -185,7 +177,7 @@ public class SqlStorage implements Storage {
                         r.addSection(st, new TextSection(rs.getString("content")));
                     }
                     case ACHIEVEMENT, QUALIFICATIONS -> {
-                        r.addSection(st, new ListSection(getListSection(rs, st)));
+                        r.addSection(st, new ListSection(getListSection(rs)));
                     }
                     case EXPERIENCE, EDUCATION -> {
                         //TODO Add OrganizationSection
@@ -209,18 +201,12 @@ public class SqlStorage implements Storage {
         ps.execute();
     }
 
-    private List<String> getListSection(ResultSet rs, SectionType st) throws SQLException {
+    private List<String> getListSection(ResultSet rs) throws SQLException {
         List<String> ls = new ArrayList<>();
-        do {
-            if (rs.getString("section_type") != null && rs.getString("section_type").equals(st.toString())) {
-                int i = rs.getInt("position");
-                String content = rs.getString("content");
-                ls.add(i, content);
-            } else {
-                rs.previous();
-                break;
-            }
-        } while (rs.next());
+        String[] strings = rs.getString("content").split("\n");
+        for (int i = 0; i < strings.length; i++) {
+            ls.add(i, strings[i]);
+        }
         return ls;
     }
 
