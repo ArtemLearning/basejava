@@ -175,7 +175,7 @@ public class SqlStorage implements Storage {
     }
 
     private Resume addSections(Connection conn, Resume r) throws SQLException {
-        try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM section AS s WHERE s.resume_uuid = ?")) {
+        try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM section AS s WHERE s.resume_uuid = ?", ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)) {
             ps.setString(1, r.getUuid());
             final ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -216,6 +216,9 @@ public class SqlStorage implements Storage {
                 int i = rs.getInt("position");
                 String content = rs.getString("content");
                 ls.add(i, content);
+            } else {
+                rs.previous();
+                break;
             }
         } while (rs.next());
         return ls;
