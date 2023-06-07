@@ -158,25 +158,10 @@ public class SqlStorage implements Storage {
                 ps.setString(2, e.getKey().toString());
                 ps.setString(3, JsonParser.write(e.getValue(), Section.class));
                 ps.addBatch();
-//                switch (e.getKey()) {
-//                    case PERSONAL, OBJECTIVE -> {
-//                        TextSection ts = (TextSection) e.getValue();
-//                        ps.setString(3, ts.getContent());
-//                        ps.addBatch();
-//                    }
-//                    case ACHIEVEMENT, QUALIFICATIONS -> {
-//                        ListSection ls = (ListSection) e.getValue();
-//                        ps.setString(3, String.join("\n", ls.getItems()));
-//                        ps.addBatch();
-//                    }
-//                    case EXPERIENCE, EDUCATION -> {  //TODO Add OrganizationSection
-//                    }
-//                }
             }
             ps.executeBatch();
         }
     }
-
 
     private void addContacts(ResultSet rs, LinkedHashMap<String, Resume> map) throws SQLException {
         while (rs.next()) {
@@ -187,28 +172,15 @@ public class SqlStorage implements Storage {
         }
     }
 
-
     private void addSections(ResultSet rs, LinkedHashMap<String, Resume> map) throws SQLException {
         while (rs.next()) {
             Resume r = map.get(rs.getString("resume_uuid"));
             if (r != null) {
                 SectionType st = SectionType.valueOf(rs.getString("section_type"));
                 r.addSection(st, JsonParser.read(rs.getString("content"), Section.class));
-//                switch (st) {
-//                    case PERSONAL, OBJECTIVE -> {
-//                        r.addSection(st, new TextSection(rs.getString("content")));
-//                    }
-//                    case ACHIEVEMENT, QUALIFICATIONS -> {
-//                        r.addSection(st, new ListSection(getListSection(rs)));
-//                    }
-//                    case EXPERIENCE, EDUCATION -> {
-//                        //TODO Add OrganizationSection
-//                    }
-//                }
             }
         }
     }
-
 
     private void deleteContacts(Connection conn, Resume r) throws SQLException {
         deleteAttributes(conn, r, "DELETE FROM contact AS c WHERE c.resume_uuid = ?");
@@ -223,14 +195,5 @@ public class SqlStorage implements Storage {
             ps.setString(1, r.getUuid());
             ps.execute();
         }
-    }
-
-    private List<String> getListSection(ResultSet rs) throws SQLException {
-        List<String> ls = new ArrayList<>();
-        String[] strings = rs.getString("content").split("\n");
-        for (int i = 0; i < strings.length; i++) {
-            ls.add(i, strings[i]);
-        }
-        return ls;
     }
 }
