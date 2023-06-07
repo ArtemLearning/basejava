@@ -172,18 +172,17 @@ public class SqlStorage implements Storage {
     }
 
 
-    private LinkedHashMap<String, Resume> addContacts(ResultSet rs, LinkedHashMap<String, Resume> map) throws SQLException {
+    private void addContacts(ResultSet rs, LinkedHashMap<String, Resume> map) throws SQLException {
         while (rs.next()) {
             Resume r = map.get(rs.getString("resume_uuid"));
             if (r != null) {
                 r.addContact(ContactType.valueOf(rs.getString("type")), rs.getString("value"));
             }
         }
-        return map;
     }
 
 
-    private LinkedHashMap<String, Resume> addSections(ResultSet rs, LinkedHashMap<String, Resume> map) throws SQLException {
+    private void addSections(ResultSet rs, LinkedHashMap<String, Resume> map) throws SQLException {
         while (rs.next()) {
             Resume r = map.get(rs.getString("resume_uuid"));
             if (r != null) {
@@ -201,7 +200,6 @@ public class SqlStorage implements Storage {
                 }
             }
         }
-        return map;
     }
 
 
