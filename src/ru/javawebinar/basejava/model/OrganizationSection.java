@@ -48,4 +48,5 @@ public class OrganizationSection extends Section {
     public String toString() {
         return organizations.toString();
     }
+
 }

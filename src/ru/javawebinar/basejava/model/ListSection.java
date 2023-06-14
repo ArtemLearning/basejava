@@ -30,7 +30,12 @@ public class ListSection extends Section {
 
     @Override
     public String toString() {
-        return items.toString();
+        String str = items.toString();
+        if (str.length() != 0) {
+            return str.substring(1, str.length() - 1);
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -45,4 +50,5 @@ public class ListSection extends Section {
     public int hashCode() {
         return items.hashCode();
     }
+
 }

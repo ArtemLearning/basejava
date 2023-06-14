@@ -16,17 +16,21 @@
         <tr>
             <th>Имя</th>
             <th>Email</th>
-            <%--            <th></th>--%>
-            <%--            <th></th>--%>
+            <th>Delete</th>
+            <th>Edit</th>
         </tr>
         <c:forEach items="${resumes}" var="resume">
             <jsp:useBean id="resume" type="ru.javawebinar.basejava.model.Resume"/>
             <tr>
-                <td><a href="resume?uuid=${resume.uuid}">${resume.fullName}</a></td>
-                <td>${resume.getContact(ContactType.MAIL)}</td>
+                <td><a href="resume?uuid=${resume.uuid}&action=view">${resume.fullName}</a></td>
+                <td><%=ContactType.MAIL.toHtml(resume.getContact(ContactType.MAIL))%><br/></td>
+                <td><a href="resume?uuid=${resume.uuid}&action=delete">Delete</a></td>
+                <td><a href="resume?uuid=${resume.uuid}&action=edit">Edit</a></td>
             </tr>
         </c:forEach>
     </table>
+    <hr>
+    <button onclick="window.location.href='resume?uuid=${resume.uuid}&action=add';">Добавить резюме</button>
 </section>
 <jsp:include page="fragments/footer.jsp"/>
 </body>
