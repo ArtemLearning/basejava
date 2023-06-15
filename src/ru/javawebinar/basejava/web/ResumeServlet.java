@@ -39,7 +39,7 @@ public class ResumeServlet extends HttpServlet {
                 return;
             }
             case "view", "edit" -> r = storage.get(uuid);
-            case "add" -> r = new Resume(String.valueOf(UUID.randomUUID()), "Введите имя");
+            case "add" -> r = new Resume(String.valueOf(UUID.randomUUID()), "");
             default -> throw new IllegalArgumentException("Action = " + action + " is illegal");
         }
         request.setAttribute("resume", r);
