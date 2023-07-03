@@ -27,7 +27,7 @@ public class DateUtil {
     }
 
     public static LocalDate parse(String date) {
-        if (date == null || "Сейчас".equals(date)) return NOW;
+        if (date == null || date.equals("") || "Сейчас".equals(date)) return NOW;
         YearMonth yearMonth = YearMonth.parse(date, FORMATTER);
         return LocalDate.of(yearMonth.getYear(), yearMonth.getMonth(), 1);
     }

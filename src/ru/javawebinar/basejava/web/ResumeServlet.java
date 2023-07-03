@@ -61,15 +61,13 @@ public class ResumeServlet extends HttpServlet {
             }
             case "add" -> {
                 r = new Resume(String.valueOf(UUID.randomUUID()), "");
-                r.addSection(SectionType.EXPERIENCE, new OrganizationSection());
-                r.addSection(SectionType.EDUCATION, new OrganizationSection());
+                r.addSection(SectionType.EXPERIENCE, new OrganizationSection(Organization.EMPTY));
+                r.addSection(SectionType.EDUCATION, new OrganizationSection(Organization.EMPTY));
             }
             default -> throw new IllegalArgumentException("Action = " + action + " is illegal");
         }
         request.setAttribute("resume", r);
-        request.getRequestDispatcher(
-                ("view").equals(action) ? "/WEB-INF/jsp/view.jsp" : "/WEB-INF/jsp/edit.jsp"
-        ).forward(request, response);
+        request.getRequestDispatcher(("view").equals(action) ? "/WEB-INF/jsp/view.jsp" : "/WEB-INF/jsp/edit.jsp").forward(request, response);
     }
 
     @Override
@@ -126,9 +124,8 @@ public class ResumeServlet extends HttpServlet {
                     r.addSection(type, new OrganizationSection(organizations));
                 }
             }
-            storage.update(r);
-            response.sendRedirect("resume");
-            return;
         }
+        storage.update(r);
+        response.sendRedirect("resume");
     }
 }
