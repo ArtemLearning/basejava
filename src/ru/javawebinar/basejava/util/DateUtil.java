@@ -18,12 +18,15 @@ public class DateUtil {
 
     public static String format(LocalDate date) {
         if (date == null) return "";
-        return date.format(FORMATTER);
+        return date.equals(NOW) ? "Сейчас" : date.format(FORMATTER);
     }
 
     public static String formatDates(Organization.Position position) {
-        return position.getEndDate().equals(NOW) ? "Текущее место работы" :
-                DateUtil.format(position.getStartDate()) + " - " + DateUtil.format(position.getEndDate());
+        return DateUtil.format(position.getStartDate()) + " - " + DateUtil.format(position.getEndDate());
+    }
+
+    public static boolean isEmpty(String str) {
+        return str == null || str.trim().length() == 0;
     }
 
     public static LocalDate parse(String date) {
